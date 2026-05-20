@@ -1,10 +1,10 @@
 ---
-project: "dnaMatcher"
+project: dnaMatcher
 version: 1
 status: draft
-created: 2026-05-18
+created: 2026-05-19
 context_type: greenfield
-product_type: desktop
+product_type: web-app
 target_scale:
   users: small
   qps: low
@@ -17,101 +17,101 @@ timeline_budget:
 
 ## Vision & Problem Statement
 
-Pasjonat genealogii DNA posiada pliki z wynikami testów DNA kilku osób — eksportowane z platform takich jak AncestryDNA, 23andMe czy FTDNA — i chce porównać te dane, zidentyfikować wspólne segmenty chromosomów oraz przypisać konkretnych przodków do odcinków chromosomów (fazowanie). Dziś wymaga to korzystania z kilku rozproszonych, głównie internetowych narzędzi, co oznacza konieczność przesyłania wrażliwych danych DNA do chmury oraz ręczne łączenie wyników z różnych systemów.
+Pasjonaci genealogii DNA mają pliki z wynikami testów (AncestryDNA, 23andMe, FTDNA) dla kilku członków rodziny i chcą porównać te dane: znaleźć wspólne segmenty chromosomów oraz przypisać konkretnych przodków do odcinków chromosomów (fazowanie). Dziś wymaga to korzystania z kilku rozproszonych, głównie dużych i płatnych narzędzi — co oznacza żmudne ręczne łączenie wyników z różnych systemów i brak spójnego, przystępnego widoku.
 
-Istniejące narzędzia (DNA Painter, Genome Mate Pro, GEDmatch) są albo wyłącznie online, albo obsługują tylko część procesu. Brakuje jednej aplikacji desktopowej, która łączy algorytmiczne wyznaczanie segmentów, ich wizualizację na mapie chromosomów i interaktywne fazowanie chromosomów — bez konieczności wysyłania danych do zewnętrznych serwerów.
+Luka jest prosta: pasjonaci genealogii nie są programistami, a istniejące narzędzia są albo drogie i rozbudowane ponad potrzebę, albo wymagają ręcznej integracji wielu źródeł. Brakuje prostego, dostępnego narzędzia, które wczyta pliki z kilku platform, porówna allele i wyda czytelny wynik segmentowy.
 
 ## User & Persona
 
-Pasjonaci genealogii DNA — osoby prywatne, które wykonały testy DNA (np. na AncestryDNA, 23andMe lub FTDNA) i samodzielnie analizują wyniki w celu odkrywania pokrewieństwa i historii rodziny. Sięgają po zaawansowane analizy segmentowe i fazowanie chromosomów, gdy podstawowe narzędzia platformy testowej nie wystarczają do mapowania wspólnych przodków. Nie muszą posiadać wiedzy bioinformatycznej — aplikacja wykonuje obliczenia, a użytkownik interpretuje wyniki i podejmuje decyzje analityczne.
+**Persona główna: pasjonat/ka genealogii DNA**
+
+- Rola: hobby-badacz rodzinny, niekoniecznie z wiedzą techniczną
+- Kontekst: posiada pliki DNA kilku osób z rodziny (rodzice, rodzeństwo, kuzyni) wyeksportowane z co najmniej jednej platformy (w MVP: MyHeritage)
+- Moment sięgnięcia po produkt: ma kilka plików .csv i chce odpowiedzieć na pytanie — "czy ten segment chromosomu przyszedł od babci czy dziadka?" lub "czy te dwie osoby dzielą wspólny odcinek chromosomu?"
+- Ból: musi używać 2–4 różnych, często płatnych narzędzi, ręcznie kopiować wyniki i porównywać tabele bez spójnego widoku
 
 ## Success Criteria
 
 ### Primary
-- Użytkownik wczytuje pliki DNA co najmniej dwóch osób, uruchamia generowanie i widzi wizualną mapę chromosomów z segmentami oznaczonymi kolorem (brak dopasowania → czerwony, half match → żółty, pełne dopasowanie → zielony) oraz towarzyszący opis tekstowy z liczbą segmentów, długością w cM i procentem podobieństwa.
+- Użytkownik loguje się, wgrywa 2+ pliki CSV z MyHeritage, wybiera dwie lub więcej osób do porównania, otrzymuje listę segmentów chromosomów z klasyfikacją no match / half match / full match oraz może przypisać segment do konkretnego przodka (fazowanie). Cały przepływ działa poprawnie od końca do końca.
 
 ### Secondary
-- Wizualizacja obsługuje porównanie 3 lub więcej osób jednocześnie.
-- Opis tekstowy zawiera statystyki: długość segmentów w cM, liczbę segmentów i procentowe podobieństwo.
+- Eksport wyników porównania do CSV lub PDF.
 
 ### Guardrails
-- Wynik jest deterministyczny — te same pliki wejściowe dają te same segmenty przy każdym uruchomieniu.
-- Dane DNA nie opuszczają urządzenia użytkownika (brak połączeń sieciowych, brak telemetrii).
-- Wizualizacja obejmuje co najmniej 22 chromosomy autosomalne + chromosom X.
-- Aplikacja nie zawiesza się ani nie crashuje podczas procesu generowania.
+- Poprawność klasyfikacji: no match / half match / full match musi być zgodna z algorytmem porównania alleli — błędna klasyfikacja dyskwalifikuje wynik.
+- Izolacja danych między kontami: żaden użytkownik nie może zobaczyć danych innego.
+- Pliki CSV z danymi DNA są przetwarzane tylko w trakcie sesji i nie są trwale przechowywane — w bazie danych zapisywane są wyłącznie obliczone wyniki segmentów.
+- Czytelny komunikat błędu przy nieprawidłowym formacie pliku zamiast awarii aplikacji.
 
 ## User Stories
 
-### US-01: Użytkownik generuje mapę podobieństw DNA
+### US-01: Porównanie DNA dwóch lub więcej osób
 
-- **Given** aplikacja jest otwarta z wczytanymi plikami CSV (MyHeritage) co najmniej dwóch osób
-- **When** użytkownik uruchamia generowanie segmentów
-- **Then** widzi wizualną mapę chromosomów (22 autosomalne + X) z segmentami oznaczonymi kolorem oraz tekstowy opis z liczbą segmentów, długością w cM i procentem podobieństwa
+- **Given** zalogowany użytkownik, który wgrał co najmniej 2 profile DNA z MyHeritage
+- **When** wybiera dwa lub więcej profili i uruchamia porównanie
+- **Then** widzi listę segmentów chromosomów z klasyfikacją no match / half match / full match w widoku tekstowym i na interaktywnym diagramie chromosomów
 
 #### Acceptance Criteria
-- Mapa obejmuje wszystkie 22 chromosomy autosomalne + chromosom X
-- Segmenty oznaczone: brak dopasowania → czerwony, half match → żółty, pełne → zielony
-- Opis tekstowy zawiera: liczbę segmentów, łączną długość w cM, procent podobieństwa
-- Wynik jest deterministyczny — te same pliki dają te same segmenty przy każdym uruchomieniu
-- Dane nie opuszczają urządzenia użytkownika w trakcie całego procesu
+- Każdy segment ma przypisaną jedną z trzech klasyfikacji
+- Wynik jest deterministyczny — te same pliki dają ten sam wynik
+- Puste pliki lub brak wspólnych chromosomów → komunikat zamiast pustej listy
 
 ## Functional Requirements
 
-### Obszar roboczy
-- FR-001: Aplikacja otwiera się z domyślnym obszarem roboczym — brak dedykowanego kroku tworzenia projektu w MVP. Priority: must-have
-  > Socrates: Kontrargument rozważony: "tworzenie projektu to zbędna ceremonia — aplikacja może po prostu otwierać się z domyślnym obszarem roboczym." Rozwiązanie: zaakceptowany — FR-001 zrewidowany; brak ekranu tworzenia projektu w MVP.
+### Authentication
+- FR-001: Użytkownik może założyć konto (email + hasło). Priority: must-have
+  > Socrates: Kontrargument rozważony: "invite-only lub jeden login redukuje friction dla małej grupy." Rozwiązanie: odrzucony — dane genetyczne w aplikacji webowej wymagają indywidualnej autoryzacji niezależnie od liczby użytkowników.
+- FR-002: Użytkownik może zalogować się i wylogować. Priority: must-have
+  > Socrates: Kontrargument rozważony: "hard-coded parser formatu MyHeritage to dług techniczny od dnia zero." Rozwiązanie: dot. implementacji, nie funkcjonalności — FR stoi; parser powinien być wymienialny (uwaga dla tech-stack-selector).
 
-### Import danych
-- FR-002: Użytkownik może wczytać plik DNA osoby w formacie CSV (MyHeritage) do aplikacji. Priority: must-have
-  > Socrates: Kontrargument rozważony: "różne platformy = różne formaty." Rozwiązanie: zawężono do jednego formatu — CSV MyHeritage — co eliminuje ryzyko przebudżetowania importu.
-- FR-003: Użytkownik może wczytać pliki DNA dla co najmniej dwóch osób w jednej sesji. Priority: must-have
-  > Socrates: Kontrargument rozważony: "limit co najmniej dwóch bez górnej granicy może dać problemy wydajnościowe." Rozwiązanie: FR stoi — górny limit nie jest definiowany w MVP.
+### DNA profiles
+- FR-003: Użytkownik może wgrać plik CSV w formacie MyHeritage jako profil DNA. Priority: must-have
+  > Socrates: Kontrargument rozważony: "format CSV MyHeritage może się zmienić między wersjami." Rozwiązanie: ryzyko implementacyjne, nie blokada FR — parser jako wymienialny moduł to uwaga dla downstream.
+- FR-004: Użytkownik może przeglądać wgrane profile DNA i usuwać je. Priority: must-have
+  > Socrates: Kontrargument rozważony: "widok listy i usuwanie to luksus w 3-tygodniowym MVP." Rozwiązanie: odrzucony — użytkownik musi kontrolować co jest załadowane; chaos przy braku zarządzania profilami.
 
-### Generowanie segmentów
-- FR-004: Użytkownik może uruchomić generowanie segmentów podobieństwa DNA dla wczytanych osób. Priority: must-have
-  > Socrates: Brak kontrargumentu — generowanie jest sercem aplikacji.
+### Comparison
+- FR-005: Użytkownik może wybrać dwa lub więcej profili DNA do porównania. Priority: must-have
+  > Socrates: Kontrargument rozważony: "fazowanie wymaga trzech próbek (dziecko + oboje rodziców)." Rozwiązanie: nietrafiony — fazowanie w tej aplikacji opiera się na akumulacji dowodów z wielu pairwise porównań z krewnymi (nie na plikach rodziców). Pairwise jest właściwym modelem; FR zaktualizowany na "dwa lub więcej".
+- FR-006: Aplikacja generuje łańcuch podobieństw alleli i klasyfikuje każdy segment chromosomu jako no match, half match lub full match — logika klasyfikacji jest silnikiem aplikacji. Priority: must-have
+  > Socrates: Kontrargument rozważony: "algorytm nie jest zdefiniowany — bez precyzji implementacja jest niemożliwa." Rozwiązanie: odrzucony — algorytm jest zdefiniowany jako porównanie alleli na pozycji; logika klasyfikacji to rdzeń silnika, nie zewnętrzna biblioteka.
+- FR-007: Użytkownik może przeglądać wyniki porównania zarówno w widoku wizualnym (interaktywny diagram chromosomów) jak i tekstowym (tabela segmentów z klasyfikacją). Priority: must-have
+  > Socrates: Kontrargument rozważony: "surowa lista segmentów bez wizualizacji jest nieczytelna dla niespecjalistów." Rozwiązanie: potwierdzony — wizualizacja chromosomów jest must-have (nie secondary). FR zaktualizowany. Uwaga: dodanie widoku wizualnego zwiększa zakres vs. oryginalne 3 tygodnie.
 
-### Wizualizacja
-- FR-005: Użytkownik może zobaczyć wizualną mapę chromosomów z segmentami oznaczonymi kolorem (brak dopasowania → czerwony, half match → żółty, pełne dopasowanie → zielony). Priority: must-have
-  > Socrates: Kontrargument rozważony: "może MVP = tabela, wizualizacja w v2." Rozwiązanie: FR stoi — kolorowa mapa chromosomów jest rdzeniem produktu; tabela nie daje tej samej wartości interpretacyjnej.
-- FR-006: Użytkownik może zobaczyć tekstowy opis podobieństw zawierający statystyki: długość segmentów w cM, liczba segmentów, procent podobieństwa. Priority: must-have
-  > Socrates: Kontrargument zaakceptowany: "opis tekstowy bez liczb ma małą wartość analityczną." Rozwiązanie: FR-006 zrewidowany — opis obejmuje statystyki (cM, liczba segmentów, procent).
+### Phasing
+- FR-008: Użytkownik może przypisać segment chromosomu do konkretnego przodka (fazowanie). Priority: must-have
+  > Socrates: Kontrargument rozważony: "brak walidacji spokrewnienia może dać błędne fazowanie." Rozwiązanie: odrzucony — ograniczenia walidacji akceptowalne w MVP; fazowanie jest głównym celem produktu.
 
-### Eksport
-- FR-007: Użytkownik może wyeksportować wizualizację lub raport do pliku. Priority: nice-to-have
-  > Socrates: Kontrargument rozważony: "eksport to feature creep w MVP." Rozwiązanie: FR stoi jako nice-to-have — zostaje w scope jeśli czas pozwoli.
+### Export
+- FR-009: Użytkownik może eksportować wyniki porównania do pliku CSV lub PDF. Priority: nice-to-have
+  > Socrates: Kontrargument rozważony: "eksport to infrastruktura, nie wartość — przy rosnącym zakresie (wizualizacja w FR-007) powinien przesunąć się do v2." Rozwiązanie: potwierdzony — FR-009 pozostaje nice-to-have, de facto v2.
 
 ## Non-Functional Requirements
 
-- Wynik generowania jest deterministyczny: te same pliki wejściowe CSV dają identyczne segmenty przy każdym uruchomieniu.
-- Żadne dane DNA nie opuszczają urządzenia użytkownika — brak połączeń sieciowych, brak telemetrii, brak zapisu danych poza urządzeniem użytkownika.
-- Aplikacja działa na macOS (najnowsze dwie główne wersje systemu).
-- Aplikacja pozostaje responsywna podczas generowania — użytkownik widzi ciągły widoczny sygnał o trwającym procesie; czas generowania nie jest ograniczony progiem w MVP (poprawność ponad prędkość).
-- Wizualizacja obejmuje wszystkie 22 chromosomy autosomalne oraz chromosom X.
+- Podczas każdej operacji porównania trwającej dłużej niż 2 sekundy użytkownik otrzymuje ciągłą widoczną informację o postępie — brak twardego limitu czasowego, lecz brak jakiejkolwiek informacji zwrotnej jest niedopuszczalny.
+- Żadne surowe dane genetyczne przesłane do przetworzenia nie są przechowywane po zakończeniu operacji przetwarzania — w bazie danych zapisywane są wyłącznie obliczone wyniki segmentów.
+- Aplikacja jest w pełni użyteczna w najnowszych wersjach Chrome, Firefox i Safari na desktopie.
 
 ## Business Logic
 
-Aplikacja porównuje ciąg alleli w pliku DNA i na podstawie wygenerowanego łańcucha podobieństw klasyfikuje wynik jako segment odpowiedniego typu: brak dopasowania, half match lub full match.
+Na podstawie porównania alleli na wspólnych pozycjach chromosomowych między dwoma lub więcej profilami DNA, aplikacja klasyfikuje każdy odcinek chromosomu jako no match, half match lub full match.
 
-Wejście: dane alleli z pliku DNA importowanego dla co najmniej dwóch osób. Użytkownik dostarcza pliki — nie konfiguruje parametrów algorytmu w MVP.
-
-Wyjście: zbiór segmentów chromosomowych z przypisaną klasyfikacją (brak / half / full). Użytkownik napotyka wynik jako kolorową mapę chromosomów i opis tekstowy ze statystykami — aplikacja klasyfikuje, użytkownik interpretuje pokrewieństwo i przypisuje fazowanie.
+Użytkownik dostarcza pliki CSV w formacie MyHeritage oraz wskazuje, które profile mają być porównane. Aplikacja przetwarza allele na każdej wspólnej pozycji chromosomowej i dla każdego odcinka wyznacza stopień zgodności. Wynik jest prezentowany na żądanie — po uruchomieniu porównania — jako tabela segmentów z klasyfikacją (chromosom, pozycja, typ) oraz interaktywny diagram chromosomów. Użytkownik może następnie ręcznie oznaczyć każdy segment przodkiem, akumulując wiedzę z wielu pairwise porównań z różnymi krewnymi, aby wywnioskować linie dziedziczenia (fazowanie przez sieć krewnych, nie przez pliki rodziców).
 
 ## Access Control
 
-Jeden użytkownik, jeden komputer. Brak logowania, brak kont, brak synchronizacji sieciowej. Dane DNA przechowywane wyłącznie lokalnie na urządzeniu użytkownika.
+Aplikacja webowa z autoryzacją login/hasło. Każdy użytkownik ma własny profil i widzi wyłącznie swoje dane. Możliwość wielu kont na jednej instancji. Płaski model ról — wszyscy użytkownicy mają identyczne uprawnienia do swoich własnych danych; brak roli administratora w MVP.
 
-MVP: jeden aktywny obszar roboczy (jeden zbiór danych DNA) na raz. Zarządzanie wieloma projektami / liniami rodzinnymi — eksplicitnie poza zakresem MVP, planowane w v2.
+Unauthenticated access: próba dostępu do jakiegokolwiek zasobu bez aktywnej sesji przekierowuje na stronę logowania.
 
 ## Non-Goals
 
-- **Fazowanie chromosomów** (przypisywanie konkretnych przodków do segmentów) — to krok drugi; MVP tylko generuje i wizualizuje segmenty, bez możliwości ich etykietowania przodkami.
-- **Import z zewnętrznych systemów** (GEDmatch API, AncestryDNA API itp.) — MVP operuje wyłącznie na lokalnych plikach CSV. Integracje zewnętrzne to osobna iteracja.
-- **Obsługa innych formatów plików DNA** (23andMe, FTDNA, RAW SNP, VCF) — tylko CSV w formacie MyHeritage w MVP; wieloformatowy import wydłużyłby timeline.
-- **Zarządzanie wieloma projektami** — MVP = jeden obszar roboczy; przełączanie projektów / linia rodzinna to v2.
-- **Synchronizacja danych, chmura, multi-device** — aplikacja jest wyłącznie lokalna; brak jakiejkolwiek synchronizacji jest twardą gwarancją prywatności.
-- **Windows / Linux** — MVP działa tylko na macOS; wsparcie innych systemów operacyjnych poza zakresem pierwszego wydania.
+- Wsparcie dla platform innych niż MyHeritage (AncestryDNA, 23andMe, FTDNA) — celowo odraczane do v2; MVP ograniczony do jednego parsera.
+- Automatyczne fazowanie — aplikacja nie wnioskuje linii dziedziczenia samodzielnie; adnotacja przodka jest zawsze ręczna przez użytkownika.
+- Współdzielenie wyników między kontami / wspólne drzewo rodzinne — każde konto jest izolowane; brak funkcji udostępniania.
+- Obsługa urządzeń mobilnych i tabletów — aplikacja przeznaczona na desktop; responsywność mobilna nie jest celem MVP.
 
 ## Open Questions
 
-Brak otwartych pytań — wszystkie elementy zostały uchwycone podczas sesji kształtowania (quality_check_status: accepted, 6/6 elementów cross-check).
+Brak otwartych pytań — wszystkie fazy discovery ukończone, quality check: accepted (2026-05-19).
