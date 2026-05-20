@@ -224,3 +224,6 @@ __marimo__/
 
 # JetBrains
 .idea/
+
+# 10x-cli course skills (local only)
+.claude/skills/
