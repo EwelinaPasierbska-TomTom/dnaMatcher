@@ -29,7 +29,7 @@ Pasjonaci genealogii DNA posiadają pliki CSV z wynikami testów kilku członkó
 
 | ID   | Change ID                   | Outcome (użytkownik może …)                                                             | Prerequisites        | PRD refs                        | Status   |
 |------|-----------------------------|-----------------------------------------------------------------------------------------|----------------------|---------------------------------|----------|
-| F-01 | auth-scaffold               | (foundation) middleware autoryzacji gotowy; tokeny Supabase Auth wydawane i weryfikowane | —                    | FR-001, FR-002, §Access Control | ready    |
+| F-01 | auth-scaffold               | (foundation) middleware autoryzacji gotowy; tokeny Supabase Auth wydawane i weryfikowane | —                    | FR-001, FR-002, §Access Control | done     |
 | F-02 | database-schema             | (foundation) schemat Supabase wdrożony; tabele profili, wyników segmentów i adnotacji   | F-01                 | FR-003, FR-006, FR-008          | proposed |
 | S-01 | user-authentication         | założyć konto, zalogować się i wylogować                                                | F-01                 | FR-001, FR-002                  | proposed |
 | S-02 | dna-profile-upload          | wgrać plik CSV MyHeritage jako profil DNA oraz przeglądać i usuwać profile              | F-01, F-02, S-01     | FR-003, FR-004                  | proposed |
@@ -70,7 +70,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Auth jest prerequisitem wszystkich slice'ów — błąd tu blokuje cały pipeline; Supabase Auth wybrany w `tech-stack.md`, ale wzorzec integracji z FastAPI wymaga weryfikacji podczas `/10x-plan`
-- **Status:** ready
+- **Status:** done
 
 ### F-02: Database schema
 
@@ -162,4 +162,4 @@ Brak otwartych pytań — PRD ma wynik 0 otwartych pytań (quality check: accept
 
 ## Done
 
-(Empty — `/10x-archive` appends entries here when a change is archived.)
+- **F-01: (foundation) middleware autoryzacji gotowy; tokeny Supabase Auth wydawane i weryfikowane** — Archived 2026-05-25 → `context/archive/2026-05-25-auth-scaffold/`. Lesson: —.
