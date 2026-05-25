@@ -13,7 +13,7 @@ FastAPI stub at `main.py` with two unprotected routes (`GET /`, `GET /health`). 
 ## Desired End State
 
 - `src/` package layout introduced with `src/auth/` and `src/routers/`
-- `GET /me` returns `{"id": "<uuid>", "email": "<email>"}` for requests with a valid Bearer JWT, HTTP 403 when no Authorization header is present (HTTPBearer FastAPI default), HTTP 401 when the token is invalid or expired
+- `GET /me` returns `{"id": "<uuid>", "email": "<email>"}` for requests with a valid Bearer JWT, HTTP 401 when no Authorization header is present or the token is invalid/expired
 - `get_current_user: Depends(...)` available as a reusable dependency for all downstream slices
 - `SUPABASE_URL` and `SUPABASE_ANON_KEY` documented in `.env.example` and declared in `render.yaml`
 - `uv run pytest`, `uv run mypy .`, `uv run ruff check .` all exit clean
@@ -313,7 +313,7 @@ def test_me_with_mocked_user() -> None:
 #### Manual Verification
 
 - `uv run uvicorn main:app --reload` starts without error (even without SUPABASE_URL set — env vars are only read on first protected request)
-- `curl http://localhost:8000/me` returns `403` (no Authorization header)
+- `curl http://localhost:8000/me` returns `401` (no Authorization header)
 - `curl http://localhost:8000/` returns `{"status":"ok",...}` (unprotected route unaffected)
 
 **Human gate**: After all automated checks pass and manual checks confirm, this scaffold is done. The next step is `/10x-plan user-authentication` (S-01) or `/10x-plan database-schema` (F-02) — they can be planned in parallel.
@@ -354,31 +354,31 @@ def test_me_with_mocked_user() -> None:
 
 #### Automated
 
-- [x] 1.1 `uv sync --frozen` exits clean after `uv add supabase`
-- [x] 1.2 `uv run ruff check .` passes
-- [x] 1.3 `uv run ruff format --check .` passes
-- [x] 1.4 `uv run mypy .` passes
-- [x] 1.5 `uv run pytest tests/test_smoke.py` passes
+- [x] 1.1 `uv sync --frozen` exits clean after `uv add supabase` — 3f10e35
+- [x] 1.2 `uv run ruff check .` passes — 3f10e35
+- [x] 1.3 `uv run ruff format --check .` passes — 3f10e35
+- [x] 1.4 `uv run mypy .` passes — 3f10e35
+- [x] 1.5 `uv run pytest tests/test_smoke.py` passes — 3f10e35
 
 #### Manual
 
-- [x] 1.6 `src/auth/` and `src/routers/` directories exist with correct files
-- [x] 1.7 `main.py` imports and registers the me router
-- [x] 1.8 `render.yaml` contains `SUPABASE_URL` and `SUPABASE_ANON_KEY` entries
-- [x] 1.9 `.env.example` present and readable
-- [x] 1.10 `AGENTS.md` updated — "no src/ yet" replaced with active layout description
+- [x] 1.6 `src/auth/` and `src/routers/` directories exist with correct files — 3f10e35
+- [x] 1.7 `main.py` imports and registers the me router — 3f10e35
+- [x] 1.8 `render.yaml` contains `SUPABASE_URL` and `SUPABASE_ANON_KEY` entries — 3f10e35
+- [x] 1.9 `.env.example` present and readable — 3f10e35
+- [x] 1.10 `AGENTS.md` updated — "no src/ yet" replaced with active layout description — 3f10e35
 
 ### Phase 2: Tests + quality gates
 
 #### Automated
 
-- [ ] 2.1 `uv run pytest` — all tests pass (including new test_auth.py)
-- [ ] 2.2 `uv run mypy .` passes
-- [ ] 2.3 `uv run ruff check .` passes
-- [ ] 2.4 `uv run ruff format --check .` passes
+- [x] 2.1 `uv run pytest` — all tests pass (including new test_auth.py)
+- [x] 2.2 `uv run mypy .` passes
+- [x] 2.3 `uv run ruff check .` passes
+- [x] 2.4 `uv run ruff format --check .` passes
 
 #### Manual
 
-- [ ] 2.5 Dev server starts without error (no SUPABASE_URL required at startup)
-- [ ] 2.6 `curl http://localhost:8000/me` returns 403
-- [ ] 2.7 `curl http://localhost:8000/` returns 200
+- [x] 2.5 Dev server starts without error (no SUPABASE_URL required at startup)
+- [x] 2.6 `curl http://localhost:8000/me` returns 401
+- [x] 2.7 `curl http://localhost:8000/` returns 200

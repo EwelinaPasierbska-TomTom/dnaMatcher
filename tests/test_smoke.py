@@ -1,2 +1,5 @@
-def test_placeholder() -> None:
-    assert True
+from main import app
+
+
+def test_app_exists() -> None:
+    assert app is not None
