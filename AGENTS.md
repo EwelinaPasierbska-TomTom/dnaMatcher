@@ -12,7 +12,7 @@
 
 `main.py` is the app entry point (currently a stub). Tests live in `tests/` (pytest, named `test_*.py`). Context docs in `@context/foundation/` (PRD, tech stack, health check) are read-only references — do not modify them. Always commit `uv.lock` changes alongside dependency changes.
 
-No `src/` layout exists yet. When the app grows: routers in `src/routers/`, domain logic in `src/services/`, DB models in `src/models/`.
+`src/` layout is now active. Subdirectories: `src/auth/` (JWT dependency, client, models), `src/routers/` (route handlers), `src/services/` (domain logic, added as needed), `src/models/` (DB models, added as needed).
 
 ## Commands
 

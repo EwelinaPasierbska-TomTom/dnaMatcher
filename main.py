@@ -1,6 +1,9 @@
 from fastapi import FastAPI
 
+from src.routers import me as me_router
+
 app = FastAPI(title="dnaMatcher", version="0.1.0")
+app.include_router(me_router.router)
 
 
 @app.get("/")

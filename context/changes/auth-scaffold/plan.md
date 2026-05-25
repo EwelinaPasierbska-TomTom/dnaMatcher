@@ -13,7 +13,7 @@ FastAPI stub at `main.py` with two unprotected routes (`GET /`, `GET /health`). 
 ## Desired End State
 
 - `src/` package layout introduced with `src/auth/` and `src/routers/`
-- `GET /me` returns `{"id": "<uuid>", "email": "<email>"}` for requests with a valid Bearer JWT, `{"detail": "Not authenticated"}` (HTTP 401) otherwise
+- `GET /me` returns `{"id": "<uuid>", "email": "<email>"}` for requests with a valid Bearer JWT, HTTP 403 when no Authorization header is present (HTTPBearer FastAPI default), HTTP 401 when the token is invalid or expired
 - `get_current_user: Depends(...)` available as a reusable dependency for all downstream slices
 - `SUPABASE_URL` and `SUPABASE_ANON_KEY` documented in `.env.example` and declared in `render.yaml`
 - `uv run pytest`, `uv run mypy .`, `uv run ruff check .` all exit clean
@@ -199,6 +199,21 @@ SUPABASE_ANON_KEY=<your-anon-public-key>
 # SECRET_KEY=...
 ```
 
+#### 10. Update `AGENTS.md`
+
+**File**: `AGENTS.md`
+
+**Intent**: Keep AGENTS.md accurate once `src/` exists so future agents don't read stale layout guidance.
+
+**Contract**: In the Project Structure section, replace:
+```
+No `src/` layout exists yet. When the app grows: routers in `src/routers/`, domain logic in `src/services/`, DB models in `src/models/`.
+```
+with:
+```
+`src/` layout is now active. Subdirectories: `src/auth/` (JWT dependency, client, models), `src/routers/` (route handlers), `src/services/` (domain logic, added as needed), `src/models/` (DB models, added as needed).
+```
+
 ### Success Criteria
 
 #### Automated Verification
@@ -228,7 +243,25 @@ Write `tests/test_auth.py` covering the three behaviours the auth scaffold must 
 
 ### Changes Required
 
-#### 1. Create `tests/test_auth.py`
+#### 1. Create `tests/conftest.py`
+
+**File**: `tests/conftest.py`
+
+**Intent**: Guarantee `app.dependency_overrides` is cleared after every test, even if an assertion raises. Without this, a test failure leaks the override into subsequent tests.
+
+**Contract**:
+```python
+from collections.abc import Generator
+import pytest
+from main import app
+
+@pytest.fixture(autouse=True)
+def clear_dependency_overrides() -> Generator[None, None, None]:
+    yield
+    app.dependency_overrides.clear()
+```
+
+#### 2. Create `tests/test_auth.py`
 
 **File**: `tests/test_auth.py`
 
@@ -257,10 +290,10 @@ def test_me_with_mocked_user() -> None:
     assert response.status_code == 200
     data = response.json()
     assert data["email"] == "test@example.com"
-    app.dependency_overrides.clear()
+    # no explicit clear — conftest.py autouse fixture handles teardown
 ```
 
-#### 2. Delete placeholder test (optional)
+#### 3. Delete placeholder test (optional)
 
 **File**: `tests/test_smoke.py`
 
@@ -321,18 +354,19 @@ def test_me_with_mocked_user() -> None:
 
 #### Automated
 
-- [ ] 1.1 `uv sync --frozen` exits clean after `uv add supabase`
-- [ ] 1.2 `uv run ruff check .` passes
-- [ ] 1.3 `uv run ruff format --check .` passes
-- [ ] 1.4 `uv run mypy .` passes
-- [ ] 1.5 `uv run pytest tests/test_smoke.py` passes
+- [x] 1.1 `uv sync --frozen` exits clean after `uv add supabase`
+- [x] 1.2 `uv run ruff check .` passes
+- [x] 1.3 `uv run ruff format --check .` passes
+- [x] 1.4 `uv run mypy .` passes
+- [x] 1.5 `uv run pytest tests/test_smoke.py` passes
 
 #### Manual
 
-- [ ] 1.6 `src/auth/` and `src/routers/` directories exist with correct files
-- [ ] 1.7 `main.py` imports and registers the me router
-- [ ] 1.8 `render.yaml` contains `SUPABASE_URL` and `SUPABASE_ANON_KEY` entries
-- [ ] 1.9 `.env.example` present and readable
+- [x] 1.6 `src/auth/` and `src/routers/` directories exist with correct files
+- [x] 1.7 `main.py` imports and registers the me router
+- [x] 1.8 `render.yaml` contains `SUPABASE_URL` and `SUPABASE_ANON_KEY` entries
+- [x] 1.9 `.env.example` present and readable
+- [x] 1.10 `AGENTS.md` updated — "no src/ yet" replaced with active layout description
 
 ### Phase 2: Tests + quality gates
 
