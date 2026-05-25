@@ -1,7 +1,7 @@
 ---
 id: auth-scaffold
 roadmap_id: F-01
-status: implemented
+status: impl_reviewed
 created: 2026-05-25
 updated: 2026-05-25
 reviewed: 2026-05-25

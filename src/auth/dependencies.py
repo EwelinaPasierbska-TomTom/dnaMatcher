@@ -1,3 +1,4 @@
+import logging
 from uuid import UUID
 
 from fastapi import Depends, HTTPException, status
@@ -6,6 +7,8 @@ from supabase import Client
 
 from src.auth.client import get_supabase_client
 from src.auth.models import CurrentUser
+
+logger = logging.getLogger(__name__)
 
 security = HTTPBearer()
 
@@ -17,6 +20,7 @@ def get_current_user(
     try:
         response = client.auth.get_user(credentials.credentials)
     except Exception:
+        logger.warning("Supabase auth error", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Not authenticated",
@@ -32,4 +36,9 @@ def get_current_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Not authenticated",
         )
-    return CurrentUser(id=UUID(str(user.id)), email=user.email or "")
+    if user.email is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated",
+        )
+    return CurrentUser(id=UUID(str(user.id)), email=user.email)
