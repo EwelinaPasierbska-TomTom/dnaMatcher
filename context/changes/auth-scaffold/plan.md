@@ -372,13 +372,13 @@ def test_me_with_mocked_user() -> None:
 
 #### Automated
 
-- [x] 2.1 `uv run pytest` — all tests pass (including new test_auth.py)
-- [x] 2.2 `uv run mypy .` passes
-- [x] 2.3 `uv run ruff check .` passes
-- [x] 2.4 `uv run ruff format --check .` passes
+- [x] 2.1 `uv run pytest` — all tests pass (including new test_auth.py) — 4298220
+- [x] 2.2 `uv run mypy .` passes — 4298220
+- [x] 2.3 `uv run ruff check .` passes — 4298220
+- [x] 2.4 `uv run ruff format --check .` passes — 4298220
 
 #### Manual
 
-- [x] 2.5 Dev server starts without error (no SUPABASE_URL required at startup)
-- [x] 2.6 `curl http://localhost:8000/me` returns 401
-- [x] 2.7 `curl http://localhost:8000/` returns 200
+- [x] 2.5 Dev server starts without error (no SUPABASE_URL required at startup) — 4298220
+- [x] 2.6 `curl http://localhost:8000/me` returns 401 — 4298220
+- [x] 2.7 `curl http://localhost:8000/` returns 200 — 4298220
