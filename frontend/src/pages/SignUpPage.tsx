@@ -33,7 +33,7 @@ export default function SignUpPage() {
     }
 
     setLoading(true)
-    const { error: authError } = await supabase.auth.signUp({
+    const { data, error: authError } = await supabase.auth.signUp({
       email,
       password,
       options: { data: { name } },
@@ -46,6 +46,13 @@ export default function SignUpPage() {
       } else {
         setError('Rejestracja nie powiodła się. Spróbuj ponownie.')
       }
+      return
+    }
+
+    // When email confirmation is disabled, Supabase returns no error for duplicate
+    // emails — instead the user object has identities: []. Detect this phantom user.
+    if ((data?.user?.identities?.length ?? 1) === 0) {
+      setError('Ten email jest już zarejestrowany.')
       return
     }
 
