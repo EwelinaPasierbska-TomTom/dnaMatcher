@@ -1,16 +1,31 @@
-from fastapi import FastAPI
+import os
+
+from fastapi import APIRouter, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from src.routers import me as me_router
 
 app = FastAPI(title="dnaMatcher", version="0.1.0")
-app.include_router(me_router.router)
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-@app.get("/")
-def root() -> dict[str, str]:
-    return {"status": "ok", "project": "dnaMatcher", "version": "0.1.0"}
+api_router = APIRouter(prefix="/api")
+api_router.include_router(me_router.router)
+app.include_router(api_router)
 
 
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "healthy", "version": "0.1.0"}
+
+
+# MUST appear after all app.include_router() calls so /api/* routes are not intercepted
+if os.path.exists("frontend/dist"):
+    app.mount("/", StaticFiles(directory="frontend/dist", html=True), name="static")

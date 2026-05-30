@@ -227,3 +227,7 @@ __marimo__/
 
 # 10x-cli course skills (local only)
 .claude/skills/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/

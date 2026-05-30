@@ -647,30 +647,30 @@ See per-phase Manual Verification checklists. Complete golden path:
 
 #### Automated
 
-- [x] 1.1 `test -f supabase/migrations/001_initial_schema.sql` exits 0
-- [x] 1.2 `grep -c "CREATE TABLE" ...` → 4
-- [x] 1.3 `grep -c "ENABLE ROW LEVEL SECURITY" ...` → 4
-- [x] 1.4 `grep -c "CREATE POLICY" ...` → 15
-- [x] 1.5 `uv run pytest` exits 0
-- [x] 1.6 `uv run mypy .` exits 0
-- [x] 1.7 `uv run ruff check .` exits 0
+- [x] 1.1 `test -f supabase/migrations/001_initial_schema.sql` exits 0 — d753d1f
+- [x] 1.2 `grep -c "CREATE TABLE" ...` → 4 — d753d1f
+- [x] 1.3 `grep -c "ENABLE ROW LEVEL SECURITY" ...` → 4 — d753d1f
+- [x] 1.4 `grep -c "CREATE POLICY" ...` → 15 — d753d1f
+- [x] 1.5 `uv run pytest` exits 0 — d753d1f
+- [x] 1.6 `uv run mypy .` exits 0 — d753d1f
+- [x] 1.7 `uv run ruff check .` exits 0 — d753d1f
 
 #### Manual
 
-- [x] 1.8 SQL applies in Supabase Dashboard without errors
-- [x] 1.9 Table Editor: 4 tables visible
-- [x] 1.10 Policies: RLS on all 4 tables, 15 policies
-- [x] 1.11 Anonymous SELECT → 0 rows
-- [x] 1.12 Anonymous INSERT → RLS violation error
-- [x] 1.13 `context/changes/database-schema/change.md` updated to `status: done`
+- [x] 1.8 SQL applies in Supabase Dashboard without errors — d753d1f
+- [x] 1.9 Table Editor: 4 tables visible — d753d1f
+- [x] 1.10 Policies: RLS on all 4 tables, 15 policies — d753d1f
+- [x] 1.11 Anonymous SELECT → 0 rows — d753d1f
+- [x] 1.12 Anonymous INSERT → RLS violation error — d753d1f
+- [x] 1.13 `context/changes/database-schema/change.md` updated to `status: done` — d753d1f
 
 ### Phase 2: React scaffold
 
 #### Automated
 
-- [ ] 2.1 `cd frontend && npm install` exits 0; `package-lock.json` generated and committed
-- [ ] 2.2 `cd frontend && npm run build` exits 0
-- [ ] 2.3 `cd frontend && npx tsc --noEmit` exits 0
+- [x] 2.1 `cd frontend && npm install` exits 0; `package-lock.json` generated and committed
+- [x] 2.2 `cd frontend && npm run build` exits 0
+- [x] 2.3 `cd frontend && npx tsc --noEmit` exits 0
 
 #### Manual
 
@@ -683,8 +683,8 @@ See per-phase Manual Verification checklists. Complete golden path:
 
 #### Automated
 
-- [ ] 3.1 `cd frontend && npx tsc --noEmit` exits 0
-- [ ] 3.2 `uv run pytest` exits 0
+- [x] 3.1 `cd frontend && npx tsc --noEmit` exits 0
+- [x] 3.2 `uv run pytest` exits 0
 
 #### Manual
 
@@ -701,10 +701,10 @@ See per-phase Manual Verification checklists. Complete golden path:
 
 #### Automated
 
-- [ ] 4.1 `uv run pytest` exits 0 (including new test_cors.py)
-- [ ] 4.2 `uv run mypy .` exits 0
-- [ ] 4.3 `uv run ruff check .` exits 0
-- [ ] 4.4 `uv run ruff format --check .` exits 0
+- [x] 4.1 `uv run pytest` exits 0 (including new test_cors.py)
+- [x] 4.2 `uv run mypy .` exits 0
+- [x] 4.3 `uv run ruff check .` exits 0
+- [x] 4.4 `uv run ruff format --check .` exits 0
 
 #### Manual
 
@@ -717,9 +717,9 @@ See per-phase Manual Verification checklists. Complete golden path:
 
 #### Automated
 
-- [ ] 5.1 `uv run pytest` exits 0 (incl. new test_health_unprotected; test_root_unprotected removed)
-- [ ] 5.2 `uv run mypy .` exits 0
-- [ ] 5.3 `uv run ruff check .` exits 0
+- [x] 5.1 `uv run pytest` exits 0 (incl. new test_health_unprotected; test_root_unprotected removed)
+- [x] 5.2 `uv run mypy .` exits 0
+- [x] 5.3 `uv run ruff check .` exits 0
 
 #### Manual
 

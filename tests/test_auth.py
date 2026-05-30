@@ -12,22 +12,22 @@ FAKE_USER = CurrentUser(
 )
 
 
-def test_root_unprotected() -> None:
+def test_health_unprotected() -> None:
     client = TestClient(app)
-    response = client.get("/")
+    response = client.get("/health")
     assert response.status_code == 200
 
 
 def test_me_without_token() -> None:
     client = TestClient(app)
-    response = client.get("/me")
+    response = client.get("/api/me")
     assert response.status_code == 401
 
 
 def test_me_with_mocked_user() -> None:
     app.dependency_overrides[get_current_user] = lambda: FAKE_USER
     client = TestClient(app)
-    response = client.get("/me")
+    response = client.get("/api/me")
     assert response.status_code == 200
     data = response.json()
     assert data["email"] == "test@example.com"
