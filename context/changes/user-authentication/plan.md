@@ -674,10 +674,10 @@ See per-phase Manual Verification checklists. Complete golden path:
 
 #### Manual
 
-- [ ] 2.4 `npm run dev` starts on port 5173 without error
-- [ ] 2.5 `/` redirects to `/login`
-- [ ] 2.6 `/app` redirects to `/login` (ProtectedRoute)
-- [ ] 2.7 No console errors on page load
+- [x] 2.4 `npm run dev` starts on port 5173 without error
+- [x] 2.5 `/` redirects to `/login`
+- [x] 2.6 `/app` redirects to `/login` (ProtectedRoute)
+- [x] 2.7 No console errors on page load
 
 ### Phase 3: Auth forms
 
@@ -688,14 +688,14 @@ See per-phase Manual Verification checklists. Complete golden path:
 
 #### Manual
 
-- [ ] 3.3 Sign-up with valid data → redirect to `/app`, email visible
-- [ ] 3.4 Refresh `/app` → still logged in
-- [ ] 3.5 Open `/login` while authenticated → redirect to `/app`
-- [ ] 3.6 Sign-out → redirect to `/login`
-- [ ] 3.7 Navigate to `/app` after logout → redirect to `/login`
-- [ ] 3.8 Sign-up with existing email → "Ten email jest już zarejestrowany."
-- [ ] 3.9 Sign-in with wrong password → "Nieprawidłowy email lub hasło."
-- [ ] 3.10 Passwords mismatch → client error, no Supabase call
+- [x] 3.3 Sign-up with valid data → redirect to `/app`, email visible
+- [x] 3.4 Refresh `/app` → still logged in
+- [x] 3.5 Open `/login` while authenticated → redirect to `/app`
+- [x] 3.6 Sign-out → redirect to `/login`
+- [x] 3.7 Navigate to `/app` after logout → redirect to `/login`
+- [x] 3.8 Sign-up with existing email → "Ten email jest już zarejestrowany."
+- [x] 3.9 Sign-in with wrong password → "Nieprawidłowy email lub hasło."
+- [x] 3.10 Passwords mismatch → client error, no Supabase call
 
 ### Phase 4: FastAPI integration
 
