@@ -230,6 +230,6 @@ __marimo__/
 
 # Frontend
 frontend/node_modules/
-frontend/dist/
 frontend/.env
 *.env.local
+!frontend/dist/
