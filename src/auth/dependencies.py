@@ -3,10 +3,10 @@ from uuid import UUID
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from supabase import Client
 
 from src.auth.client import get_supabase_client
 from src.auth.models import CurrentUser
+from supabase import Client
 
 logger = logging.getLogger(__name__)
 
