@@ -15,12 +15,19 @@ export default function AppPage() {
   const navigate = useNavigate()
   const [comparisons, setComparisons] = useState<ComparisonSummary[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     void (async () => {
       try {
         const res = await apiFetch('/api/comparisons')
-        if (res.ok) setComparisons((await res.json()) as ComparisonSummary[])
+        if (res.ok) {
+          setComparisons((await res.json()) as ComparisonSummary[])
+        } else {
+          setError('Nie udało się załadować historii porównań.')
+        }
+      } catch {
+        setError('Nie udało się połączyć z serwerem.')
       } finally {
         setLoading(false)
       }
@@ -58,9 +65,10 @@ export default function AppPage() {
             Historia porównań
           </h2>
 
+          {error && <p className="text-red-600 text-sm mb-3">{error}</p>}
           {loading ? (
             <p className="text-sm text-gray-400 text-center py-8">Ładowanie…</p>
-          ) : comparisons.length === 0 ? (
+          ) : comparisons.length === 0 && !error ? (
             <div className="bg-white rounded-lg shadow px-6 py-10 text-center">
               <p className="text-gray-400">
                 Brak porównań. Kliknij &quot;Nowe porównanie&quot; aby zacząć.

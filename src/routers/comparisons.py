@@ -129,9 +129,20 @@ async def create_comparison(
             detail="Liczba plików musi odpowiadać liczbie imion.",
         )
 
-    # Parse all CSV files
+    # Parse all CSV files — enforce 50 MB per-file cap before reading into memory
+    _MAX_CSV_BYTES = 50 * 1024 * 1024
+    raw_files: list[bytes] = []
+    for f in files:
+        content = await f.read(_MAX_CSV_BYTES + 1)
+        if len(content) > _MAX_CSV_BYTES:
+            raise HTTPException(
+                status_code=413,
+                detail="Plik CSV jest zbyt duży (max 50 MB).",
+            )
+        raw_files.append(content)
+
     try:
-        parsed = [parse_myheritage_csv(await f.read()) for f in files]
+        parsed = [parse_myheritage_csv(data) for data in raw_files]
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
@@ -148,18 +159,25 @@ async def create_comparison(
     profiles_data = profiles_res.data
     profile_ids = [row["id"] for row in profiles_data]
 
-    # Create comparisons record
-    comp_res = (
-        client.table("comparisons")
-        .insert(
-            {
-                "user_id": str(current_user.id),
-                "name": name,
-                "profile_ids": profile_ids,
-            }
+    # Create comparisons record — cleanup profiles on failure to avoid orphaned rows
+    try:
+        comp_res = (
+            client.table("comparisons")
+            .insert(
+                {
+                    "user_id": str(current_user.id),
+                    "name": name,
+                    "profile_ids": profile_ids,
+                }
+            )
+            .execute()
         )
-        .execute()
-    )
+    except Exception:
+        client.table("dna_profiles").delete().in_("id", profile_ids).execute()
+        raise HTTPException(
+            status_code=500,
+            detail="Błąd zapisu danych. Spróbuj ponownie.",
+        )
     comparison_id: str = comp_res.data[0]["id"]
     created_at: str = comp_res.data[0]["created_at"]
 

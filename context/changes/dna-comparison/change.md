@@ -1,7 +1,7 @@
 ---
 change_id: dna-comparison
 title: DNA Comparison (S-02 + S-03) — upload CSV + algorytm segmentacji + wyniki
-status: implemented
+status: impl_reviewed
 created: 2026-05-30
 updated: 2026-05-31
 archived_at: null

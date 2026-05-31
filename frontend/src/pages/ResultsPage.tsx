@@ -90,6 +90,7 @@ export default function ResultsPage() {
       navigate('/app')
     } catch {
       setDeleting(false)
+      setError('Nie udało się usunąć porównania.')
     }
   }
 
