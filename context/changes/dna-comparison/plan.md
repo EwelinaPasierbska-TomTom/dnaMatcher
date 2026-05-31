@@ -500,30 +500,30 @@ Importy: `ComparePage` z `./pages/ComparePage`, `ResultsPage` z `./pages/Results
 
 #### Automated
 
-- [x] 1.1 `test -f supabase/migrations/002_comparison_results_columns.sql` exits 0
-- [x] 1.2 `grep -c "ADD COLUMN" ...` → 5
-- [x] 1.3 `uv run pytest` exits 0
-- [x] 1.4 `uv run mypy .` exits 0
-- [x] 1.5 `uv run ruff check .` exits 0
+- [x] 1.1 `test -f supabase/migrations/002_comparison_results_columns.sql` exits 0 — 5b4ed69
+- [x] 1.2 `grep -c "ADD COLUMN" ...` → 5 — 5b4ed69
+- [x] 1.3 `uv run pytest` exits 0 — 5b4ed69
+- [x] 1.4 `uv run mypy .` exits 0 — 5b4ed69
+- [x] 1.5 `uv run ruff check .` exits 0 — 5b4ed69
 
 #### Manual
 
-- [x] 1.6 Migration applied in Supabase Dashboard without errors
-- [x] 1.7 Table Editor: 5 new columns visible in comparison_results
+- [x] 1.6 Migration applied in Supabase Dashboard without errors — 5b4ed69
+- [x] 1.7 Table Editor: 5 new columns visible in comparison_results — 5b4ed69
 
 ### Phase 2: Backend core — parser i algorytm
 
 #### Automated
 
-- [ ] 2.1 `uv run pytest tests/test_dna_parser.py -v` exits 0
-- [ ] 2.2 `uv run pytest tests/test_dna_algorithm.py -v` exits 0
-- [ ] 2.3 `uv run pytest` exits 0
-- [ ] 2.4 `uv run mypy .` exits 0
-- [ ] 2.5 `uv run ruff check .` exits 0
+- [x] 2.1 `uv run pytest tests/test_dna_parser.py -v` exits 0
+- [x] 2.2 `uv run pytest tests/test_dna_algorithm.py -v` exits 0
+- [x] 2.3 `uv run pytest` exits 0
+- [x] 2.4 `uv run mypy .` exits 0
+- [x] 2.5 `uv run ruff check .` exits 0
 
 #### Manual
 
-- [ ] 2.6 Parser uruchomiony ręcznie na ewaSample.csv daje niepusty wynik
+- [x] 2.6 Parser uruchomiony ręcznie na ewaSample.csv daje niepusty wynik
 
 ### Phase 3: Backend API — endpointy porównań
 
