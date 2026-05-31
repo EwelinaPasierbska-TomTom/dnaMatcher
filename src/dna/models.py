@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 
-@dataclass
+@dataclass(slots=True)
 class SNPRecord:
     rsid: str
     chromosome: str
@@ -11,7 +11,7 @@ class SNPRecord:
     allele2: str
 
 
-@dataclass
+@dataclass(slots=True)
 class Segment:
     chromosome: str
     match_type: str  # FULL | HALF | NONE
