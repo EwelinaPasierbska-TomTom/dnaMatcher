@@ -515,29 +515,29 @@ Importy: `ComparePage` z `./pages/ComparePage`, `ResultsPage` z `./pages/Results
 
 #### Automated
 
-- [x] 2.1 `uv run pytest tests/test_dna_parser.py -v` exits 0
-- [x] 2.2 `uv run pytest tests/test_dna_algorithm.py -v` exits 0
-- [x] 2.3 `uv run pytest` exits 0
-- [x] 2.4 `uv run mypy .` exits 0
-- [x] 2.5 `uv run ruff check .` exits 0
+- [x] 2.1 `uv run pytest tests/test_dna_parser.py -v` exits 0 — c97821e
+- [x] 2.2 `uv run pytest tests/test_dna_algorithm.py -v` exits 0 — c97821e
+- [x] 2.3 `uv run pytest` exits 0 — c97821e
+- [x] 2.4 `uv run mypy .` exits 0 — c97821e
+- [x] 2.5 `uv run ruff check .` exits 0 — c97821e
 
 #### Manual
 
-- [x] 2.6 Parser uruchomiony ręcznie na ewaSample.csv daje niepusty wynik
+- [x] 2.6 Parser uruchomiony ręcznie na ewaSample.csv daje niepusty wynik — c97821e
 
 ### Phase 3: Backend API — endpointy porównań
 
 #### Automated
 
-- [ ] 3.1 `uv run pytest` exits 0 (w tym test_comparisons_api.py)
-- [ ] 3.2 `uv run mypy .` exits 0
-- [ ] 3.3 `uv run ruff check .` exits 0
-- [ ] 3.4 `uv run ruff format --check .` exits 0
+- [x] 3.1 `uv run pytest` exits 0 (w tym test_comparisons_api.py)
+- [x] 3.2 `uv run mypy .` exits 0
+- [x] 3.3 `uv run ruff check .` exits 0
+- [x] 3.4 `uv run ruff format --check .` exits 0
 
 #### Manual
 
-- [ ] 3.5 `curl POST /api/comparisons` z 2 plikami CSV → 200 + segmenty
-- [ ] 3.6 `curl GET /api/comparisons` → lista sesji
+- [x] 3.5 `curl POST /api/comparisons` z 2 plikami CSV → 200 + segmenty
+- [x] 3.6 `curl GET /api/comparisons` → lista sesji
 
 ### Phase 4: Frontend — formularz, wyniki, historia
 

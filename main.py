@@ -5,6 +5,7 @@ from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
+from src.routers import comparisons as comparisons_router
 from src.routers import me as me_router
 
 app = FastAPI(title="dnaMatcher", version="0.1.0")
@@ -21,6 +22,7 @@ app.add_middleware(
 
 api_router = APIRouter(prefix="/api")
 api_router.include_router(me_router.router)
+api_router.include_router(comparisons_router.router)
 app.include_router(api_router)
 
 

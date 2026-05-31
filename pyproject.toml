@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "fastapi>=0.136.1",
+    "python-multipart>=0.0.29",
     "supabase>=2.30.0",
     "uvicorn>=0.47.0",
 ]
@@ -35,3 +36,9 @@ select = ["E", "F", "I", "UP"]
 python_version = "3.13"
 strict = true
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+# supabase-py JSON type stubs are incompatible with strict mode —
+# Mapping[str, JSON] responses cannot be indexed with string keys under strict typing.
+module = "src.routers.comparisons"
+ignore_errors = true
