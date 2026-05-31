@@ -41,4 +41,4 @@ def get_current_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Not authenticated",
         )
-    return CurrentUser(id=UUID(str(user.id)), email=user.email)
+    return CurrentUser(id=UUID(str(user.id)), email=user.email, access_token=credentials.credentials)

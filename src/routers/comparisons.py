@@ -148,6 +148,8 @@ async def create_comparison(
             raise HTTPException(status_code=400, detail=str(exc)) from exc
         del content  # free raw bytes before reading the next file
 
+    db = client.postgrest.auth(current_user.access_token)
+
     # Create dna_profiles records
     profile_rows = [
         {
@@ -157,14 +159,14 @@ async def create_comparison(
         }
         for i in range(len(files))
     ]
-    profiles_res = client.table("dna_profiles").insert(profile_rows).execute()
+    profiles_res = db.from_("dna_profiles").insert(profile_rows).execute()
     profiles_data = profiles_res.data
     profile_ids = [row["id"] for row in profiles_data]
 
     # Create comparisons record — cleanup profiles on failure to avoid orphaned rows
     try:
         comp_res = (
-            client.table("comparisons")
+            db.from_("comparisons")
             .insert(
                 {
                     "user_id": str(current_user.id),
@@ -175,7 +177,7 @@ async def create_comparison(
             .execute()
         )
     except Exception:
-        client.table("dna_profiles").delete().in_("id", profile_ids).execute()
+        db.from_("dna_profiles").delete().in_("id", profile_ids).execute()
         raise HTTPException(
             status_code=500,
             detail="Błąd zapisu danych. Spróbuj ponownie.",
@@ -222,8 +224,8 @@ async def create_comparison(
 
     if total_segments == 0:
         # Clean up and return error
-        client.table("comparisons").delete().eq("id", comparison_id).execute()
-        client.table("dna_profiles").delete().in_("id", profile_ids).execute()
+        db.from_("comparisons").delete().eq("id", comparison_id).execute()
+        db.from_("dna_profiles").delete().in_("id", profile_ids).execute()
         raise HTTPException(
             status_code=400,
             detail=(
@@ -233,7 +235,7 @@ async def create_comparison(
         )
 
     if all_result_rows:
-        client.table("comparison_results").insert(all_result_rows).execute()
+        db.from_("comparison_results").insert(all_result_rows).execute()
 
     profiles_out = [
         ProfileMeta(
@@ -258,8 +260,9 @@ def list_comparisons(
     current_user: CurrentUser = Depends(get_current_user),
     client: Client = Depends(get_supabase_client),
 ) -> list[ComparisonSummary]:
+    db = client.postgrest.auth(current_user.access_token)
     comps_res = (
-        client.table("comparisons")
+        db.from_("comparisons")
         .select("id, name, created_at, profile_ids")
         .eq("user_id", str(current_user.id))
         .order("created_at", desc=True)
@@ -272,7 +275,7 @@ def list_comparisons(
         {pid for row in comps_res.data for pid in row["profile_ids"]}
     )
     profiles_res = (
-        client.table("dna_profiles")
+        db.from_("dna_profiles")
         .select("id, name")
         .in_("id", all_profile_ids)
         .execute()
@@ -296,8 +299,9 @@ def get_comparison(
     current_user: CurrentUser = Depends(get_current_user),
     client: Client = Depends(get_supabase_client),
 ) -> ComparisonResponse:
+    db = client.postgrest.auth(current_user.access_token)
     comp_res = (
-        client.table("comparisons")
+        db.from_("comparisons")
         .select("*")
         .eq("id", str(comparison_id))
         .eq("user_id", str(current_user.id))
@@ -310,7 +314,7 @@ def get_comparison(
     profile_ids: list[str] = comp["profile_ids"]
 
     profiles_res = (
-        client.table("dna_profiles")
+        db.from_("dna_profiles")
         .select("id, name, original_filename")
         .in_("id", profile_ids)
         .execute()
@@ -318,7 +322,7 @@ def get_comparison(
     profiles_map = {row["id"]: row for row in profiles_res.data}
 
     results_res = (
-        client.table("comparison_results")
+        db.from_("comparison_results")
         .select("*")
         .eq("comparison_id", str(comparison_id))
         .execute()
@@ -372,8 +376,9 @@ def delete_comparison(
     current_user: CurrentUser = Depends(get_current_user),
     client: Client = Depends(get_supabase_client),
 ) -> None:
+    db = client.postgrest.auth(current_user.access_token)
     comp_res = (
-        client.table("comparisons")
+        db.from_("comparisons")
         .select("profile_ids")
         .eq("id", str(comparison_id))
         .eq("user_id", str(current_user.id))
@@ -385,6 +390,6 @@ def delete_comparison(
     profile_ids: list[str] = comp_res.data[0]["profile_ids"]
 
     # comparison_results cascade on comparison delete
-    client.table("comparisons").delete().eq("id", str(comparison_id)).execute()
+    db.from_("comparisons").delete().eq("id", str(comparison_id)).execute()
     # profiles don't have FK cascade — delete explicitly
-    client.table("dna_profiles").delete().in_("id", profile_ids).execute()
+    db.from_("dna_profiles").delete().in_("id", profile_ids).execute()
