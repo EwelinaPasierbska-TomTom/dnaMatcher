@@ -2,8 +2,8 @@ services:
   - type: web
     name: dnaMatcher
     runtime: python
-    buildCommand: pip install uv && uv sync --frozen --no-dev
-    startCommand: .venv/bin/uvicorn main:app --host 0.0.0.0 --port $PORT
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
     envVars:
       - key: DATABASE_URL
