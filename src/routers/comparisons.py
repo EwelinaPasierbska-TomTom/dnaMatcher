@@ -275,10 +275,7 @@ def list_comparisons(
         {pid for row in comps_res.data for pid in row["profile_ids"]}
     )
     profiles_res = (
-        db.from_("dna_profiles")
-        .select("id, name")
-        .in_("id", all_profile_ids)
-        .execute()
+        db.from_("dna_profiles").select("id, name").in_("id", all_profile_ids).execute()
     )
     id_to_name = {row["id"]: row["name"] for row in profiles_res.data}
 
