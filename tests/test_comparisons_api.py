@@ -71,7 +71,7 @@ def _make_supabase_mock() -> MagicMock:
         {"id": PROFILE_ID_B, "name": "Jan"},
     ]
 
-    def table_side_effect(table_name: str) -> MagicMock:
+    def from_side_effect(table_name: str) -> MagicMock:
         t = MagicMock()
         if table_name == "dna_profiles":
             t.insert.return_value.execute.return_value = profiles_insert_resp
@@ -88,7 +88,9 @@ def _make_supabase_mock() -> MagicMock:
             t.insert.return_value.execute.return_value = results_insert_resp
         return t
 
-    mock.table.side_effect = table_side_effect
+    db_mock = MagicMock()
+    db_mock.from_.side_effect = from_side_effect
+    mock.postgrest.auth.return_value = db_mock
     return mock
 
 
