@@ -3,6 +3,8 @@ import type { ReactNode } from 'react'
 import { useAuth } from './context/AuthContext'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import AppPage from './pages/AppPage'
+import ComparePage from './pages/ComparePage'
+import ResultsPage from './pages/ResultsPage'
 import SignInPage from './pages/SignInPage'
 import SignUpPage from './pages/SignUpPage'
 
@@ -42,6 +44,8 @@ export default function App() {
         />
         <Route element={<ProtectedRoute />}>
           <Route path="/app" element={<AppPage />} />
+          <Route path="/compare" element={<ComparePage />} />
+          <Route path="/results/:id" element={<ResultsPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

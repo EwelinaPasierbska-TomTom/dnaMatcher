@@ -529,29 +529,29 @@ Importy: `ComparePage` z `./pages/ComparePage`, `ResultsPage` z `./pages/Results
 
 #### Automated
 
-- [x] 3.1 `uv run pytest` exits 0 (w tym test_comparisons_api.py)
-- [x] 3.2 `uv run mypy .` exits 0
-- [x] 3.3 `uv run ruff check .` exits 0
-- [x] 3.4 `uv run ruff format --check .` exits 0
+- [x] 3.1 `uv run pytest` exits 0 (w tym test_comparisons_api.py) — f35f4ab
+- [x] 3.2 `uv run mypy .` exits 0 — f35f4ab
+- [x] 3.3 `uv run ruff check .` exits 0 — f35f4ab
+- [x] 3.4 `uv run ruff format --check .` exits 0 — f35f4ab
 
 #### Manual
 
-- [x] 3.5 `curl POST /api/comparisons` z 2 plikami CSV → 200 + segmenty
-- [x] 3.6 `curl GET /api/comparisons` → lista sesji
+- [x] 3.5 `curl POST /api/comparisons` z 2 plikami CSV → 200 + segmenty — f35f4ab
+- [x] 3.6 `curl GET /api/comparisons` → lista sesji — f35f4ab
 
 ### Phase 4: Frontend — formularz, wyniki, historia
 
 #### Automated
 
-- [ ] 4.1 `cd frontend && npx tsc --noEmit` exits 0
-- [ ] 4.2 `uv run pytest` exits 0 (brak regresji backendowych)
+- [x] 4.1 `cd frontend && npx tsc --noEmit` exits 0
+- [x] 4.2 `uv run pytest` exits 0 (brak regresji backendowych)
 
 #### Manual
 
-- [ ] 4.3 `/app` pokazuje listę porównań lub pusty stan
-- [ ] 4.4 Formularz `/compare` z 2 CSV → spinner → redirect `/results/:id`
-- [ ] 4.5 Wyniki: tabela segmentów + diagram chromosomów z kolorami
-- [ ] 4.6 3 osoby → 3 pairwise + 1 sekcja 3-way w accordion
-- [ ] 4.7 Usunięcie porównania → redirect `/app`
-- [ ] 4.8 Odświeżenie `/results/:id` → wyniki trwałe
-- [ ] 4.9 Błędny CSV → polski komunikat błędu
+- [x] 4.3 `/app` pokazuje listę porównań lub pusty stan
+- [x] 4.4 Formularz `/compare` z 2 CSV → spinner → redirect `/results/:id`
+- [x] 4.5 Wyniki: tabela segmentów + diagram chromosomów z kolorami
+- [x] 4.6 3 osoby → 3 pairwise + 1 sekcja 3-way w accordion
+- [x] 4.7 Usunięcie porównania → redirect `/app`
+- [x] 4.8 Odświeżenie `/results/:id` → wyniki trwałe
+- [x] 4.9 Błędny CSV → polski komunikat błędu
