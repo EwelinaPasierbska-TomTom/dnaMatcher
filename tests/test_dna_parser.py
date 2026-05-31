@@ -32,7 +32,7 @@ def test_skips_invalid_genotypes() -> None:
     )
     records = parse_myheritage_csv(data)
     assert len(records) == 1
-    assert records[0].rsid == "rs1"
+    assert records[0].chromosome == "1"
 
 
 def test_normalizes_allele_order() -> None:
