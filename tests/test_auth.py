@@ -9,6 +9,7 @@ from src.auth.models import CurrentUser
 FAKE_USER = CurrentUser(
     id=UUID("00000000-0000-0000-0000-000000000001"),
     email="test@example.com",
+    access_token="fake-token",
 )
 
 
