@@ -543,15 +543,15 @@ Importy: `ComparePage` z `./pages/ComparePage`, `ResultsPage` z `./pages/Results
 
 #### Automated
 
-- [x] 4.1 `cd frontend && npx tsc --noEmit` exits 0
-- [x] 4.2 `uv run pytest` exits 0 (brak regresji backendowych)
+- [x] 4.1 `cd frontend && npx tsc --noEmit` exits 0 — fbdacdc
+- [x] 4.2 `uv run pytest` exits 0 (brak regresji backendowych) — fbdacdc
 
 #### Manual
 
-- [x] 4.3 `/app` pokazuje listę porównań lub pusty stan
-- [x] 4.4 Formularz `/compare` z 2 CSV → spinner → redirect `/results/:id`
-- [x] 4.5 Wyniki: tabela segmentów + diagram chromosomów z kolorami
-- [x] 4.6 3 osoby → 3 pairwise + 1 sekcja 3-way w accordion
-- [x] 4.7 Usunięcie porównania → redirect `/app`
-- [x] 4.8 Odświeżenie `/results/:id` → wyniki trwałe
-- [x] 4.9 Błędny CSV → polski komunikat błędu
+- [x] 4.3 `/app` pokazuje listę porównań lub pusty stan — fbdacdc
+- [x] 4.4 Formularz `/compare` z 2 CSV → spinner → redirect `/results/:id` — fbdacdc
+- [x] 4.5 Wyniki: tabela segmentów + diagram chromosomów z kolorami — fbdacdc
+- [x] 4.6 3 osoby → 3 pairwise + 1 sekcja 3-way w accordion — fbdacdc
+- [x] 4.7 Usunięcie porównania → redirect `/app` — fbdacdc
+- [x] 4.8 Odświeżenie `/results/:id` → wyniki trwałe — fbdacdc
+- [x] 4.9 Błędny CSV → polski komunikat błędu — fbdacdc
