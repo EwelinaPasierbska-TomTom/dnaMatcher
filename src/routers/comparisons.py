@@ -129,17 +129,17 @@ async def create_comparison(
             detail="Liczba plików musi odpowiadać liczbie imion.",
         )
 
-    # Parse all CSV files — enforce 10 MB per-file cap before reading into memory.
-    # Render free tier has 512 MB RAM; a 10 MB CSV (~300k SNPs) uses ~120 MB
-    # after parsing into SNPRecord objects (slots=True keeps overhead low).
-    _MAX_CSV_BYTES = 10 * 1024 * 1024
+    # Parse all CSV files — enforce 20 MB per-file cap before reading into memory.
+    # Render free tier has 512 MB RAM; a 16 MB CSV uses ~192 MB after parsing
+    # into SNPRecord objects (slots=True keeps overhead low).
+    _MAX_CSV_BYTES = 20 * 1024 * 1024
     raw_files: list[bytes] = []
     for f in files:
         content = await f.read(_MAX_CSV_BYTES + 1)
         if len(content) > _MAX_CSV_BYTES:
             raise HTTPException(
                 status_code=413,
-                detail="Plik CSV jest zbyt duży (max 10 MB).",
+                detail="Plik CSV jest zbyt duży (max 20 MB).",
             )
         raw_files.append(content)
 
