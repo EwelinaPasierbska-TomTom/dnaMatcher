@@ -5,7 +5,6 @@ from src.dna.models import SNPRecord
 def _snp(chrom: str, pos: int, g: str, rsid: str = "rs0") -> SNPRecord:
     a, b = sorted(g)
     return SNPRecord(
-        rsid=rsid,
         chromosome=chrom,
         position_bp=pos,
         position_cm=None,

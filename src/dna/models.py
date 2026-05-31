@@ -3,7 +3,6 @@ from dataclasses import dataclass
 
 @dataclass(slots=True)
 class SNPRecord:
-    rsid: str
     chromosome: str
     position_bp: int
     position_cm: float | None

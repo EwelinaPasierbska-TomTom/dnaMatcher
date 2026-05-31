@@ -129,11 +129,12 @@ async def create_comparison(
             detail="Liczba plików musi odpowiadać liczbie imion.",
         )
 
-    # Parse all CSV files — enforce 20 MB per-file cap before reading into memory.
-    # Render free tier has 512 MB RAM; a 16 MB CSV uses ~192 MB after parsing
-    # into SNPRecord objects (slots=True keeps overhead low).
+    # Parse files one at a time and free raw bytes immediately — keeps peak RAM
+    # low on Render free tier (512 MB).  Each 16 MB CSV parses to ~80 MB of
+    # SNPRecord objects; holding all raw bytes simultaneously would add another
+    # 32–48 MB for nothing.
     _MAX_CSV_BYTES = 20 * 1024 * 1024
-    raw_files: list[bytes] = []
+    parsed: list[list] = []
     for f in files:
         content = await f.read(_MAX_CSV_BYTES + 1)
         if len(content) > _MAX_CSV_BYTES:
@@ -141,12 +142,11 @@ async def create_comparison(
                 status_code=413,
                 detail="Plik CSV jest zbyt duży (max 20 MB).",
             )
-        raw_files.append(content)
-
-    try:
-        parsed = [parse_myheritage_csv(data) for data in raw_files]
-    except ValueError as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
+        try:
+            parsed.append(parse_myheritage_csv(content))
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+        del content  # free raw bytes before reading the next file
 
     # Create dna_profiles records
     profile_rows = [
