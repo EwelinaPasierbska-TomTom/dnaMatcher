@@ -64,6 +64,10 @@ class ComparisonSummary(BaseModel):
 # ---------------------------------------------------------------------------
 
 
+_MATCH_TYPE_TO_DB = {"FULL": "full_match", "HALF": "half_match", "NONE": "no_match"}
+_DB_TO_MATCH_TYPE = {v: k for k, v in _MATCH_TYPE_TO_DB.items()}
+
+
 def _segment_to_row(
     seg: Segment, comparison_id: str, pair_profile_ids: list[str]
 ) -> dict[str, object]:
@@ -73,7 +77,7 @@ def _segment_to_row(
         "start_position": seg.start_bp,
         "end_position": seg.end_bp,
         "snp_count": seg.snp_count,
-        "classification": seg.match_type,
+        "classification": _MATCH_TYPE_TO_DB[seg.match_type],
         "start_cm": seg.start_cm,
         "end_cm": seg.end_cm,
         "length_bp": seg.length_bp,
@@ -331,7 +335,9 @@ def get_comparison(
         key = tuple(row["pair_profile_ids"])
         seg = SegmentOut(
             chromosome=row["chromosome"],
-            match_type=row["classification"],
+            match_type=_DB_TO_MATCH_TYPE.get(
+                row["classification"], row["classification"]
+            ),
             start_bp=row["start_position"],
             end_bp=row["end_position"],
             start_cm=row.get("start_cm"),
