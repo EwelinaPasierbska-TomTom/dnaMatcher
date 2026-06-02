@@ -388,14 +388,14 @@ Renderowanie:
 
 #### Automated
 
-- [x] 3.1 `cd frontend && npx tsc --noEmit` exits 0
-- [x] 3.2 `uv run pytest` exits 0
+- [x] 3.1 `cd frontend && npx tsc --noEmit` exits 0 — 42ffab1
+- [x] 3.2 `uv run pytest` exits 0 — 42ffab1
 
 #### Manual
 
-- [x] 3.3 Klik segment → formularz z dropdown + strand + pole przodka
-- [x] 3.4 Zapisz adnotację → badge w tabeli + overlay na diagramie
-- [x] 3.5 Zmiana osoby w dropdown → pre-fill istniejącej adnotacji lub czyste pola
-- [x] 3.6 Usuń adnotację → badge i overlay znikają
-- [x] 3.7 Odświeżenie strony → adnotacje trwałe
-- [x] 3.8 Błąd sieci przy zapisie → komunikat błędu, formularz nie zamknięty
+- [x] 3.3 Klik segment → formularz z dropdown + strand + pole przodka — 42ffab1
+- [x] 3.4 Zapisz adnotację → badge w tabeli + overlay na diagramie — 42ffab1
+- [x] 3.5 Zmiana osoby w dropdown → pre-fill istniejącej adnotacji lub czyste pola — 42ffab1
+- [x] 3.6 Usuń adnotację → badge i overlay znikają — 42ffab1
+- [x] 3.7 Odświeżenie strony → adnotacje trwałe — 42ffab1
+- [x] 3.8 Błąd sieci przy zapisie → komunikat błędu, formularz nie zamknięty — 42ffab1
