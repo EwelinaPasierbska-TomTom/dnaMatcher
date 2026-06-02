@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import type { AnnotationOut } from '../components/ChromosomeDiagram'
 import ChromosomeDiagram, { type SegmentOut } from '../components/ChromosomeDiagram'
-import SegmentTable from '../components/SegmentTable'
+import SegmentTable, { type ProfileMeta, type UpsertAnnotationBody } from '../components/SegmentTable'
 import { apiFetch } from '../lib/api'
 
 interface PairResult {
@@ -14,15 +15,34 @@ interface ComparisonData {
   id: string
   name: string
   created_at: string
+  profiles: ProfileMeta[]
   pairs: PairResult[]
 }
 
-function PairSection({ pair, defaultOpen }: { pair: PairResult; defaultOpen: boolean }) {
+interface PairSectionProps {
+  pair: PairResult
+  defaultOpen: boolean
+  profiles: ProfileMeta[]
+  annotations: AnnotationOut[]
+  onAnnotate: (body: UpsertAnnotationBody) => Promise<void>
+  onDeleteAnnotation: (id: string) => Promise<void>
+}
+
+function PairSection({
+  pair,
+  defaultOpen,
+  profiles,
+  annotations,
+  onAnnotate,
+  onDeleteAnnotation,
+}: PairSectionProps) {
   const [open, setOpen] = useState(defaultOpen)
   const label =
     pair.person_names.length === 2
       ? `${pair.person_names[0]} vs ${pair.person_names[1]}`
       : pair.person_names.join(' vs ') + ' (3-way)'
+
+  const pairProfiles = profiles.filter((p) => pair.profile_ids.includes(p.id))
 
   return (
     <div className="border border-gray-200 rounded-lg overflow-hidden">
@@ -39,13 +59,19 @@ function PairSection({ pair, defaultOpen }: { pair: PairResult; defaultOpen: boo
             <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
               Diagram chromosomów
             </h3>
-            <ChromosomeDiagram segments={pair.segments} />
+            <ChromosomeDiagram segments={pair.segments} annotations={annotations} />
           </div>
           <div>
             <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
               Segmenty ({pair.segments.length})
             </h3>
-            <SegmentTable segments={pair.segments} />
+            <SegmentTable
+              segments={pair.segments}
+              profiles={pairProfiles}
+              annotations={annotations}
+              onAnnotate={onAnnotate}
+              onDeleteAnnotation={onDeleteAnnotation}
+            />
           </div>
         </div>
       )}
@@ -60,20 +86,29 @@ export default function ResultsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [deleting, setDeleting] = useState(false)
+  const [annotations, setAnnotations] = useState<AnnotationOut[]>([])
 
   useEffect(() => {
     void (async () => {
       try {
-        const res = await apiFetch(`/api/comparisons/${id}`)
-        if (res.status === 404) {
+        const [compRes, annRes] = await Promise.all([
+          apiFetch(`/api/comparisons/${id}`),
+          apiFetch(`/api/comparisons/${id}/annotations`),
+        ])
+
+        if (compRes.status === 404) {
           setError('Porównanie nie znalezione.')
           return
         }
-        if (!res.ok) {
+        if (!compRes.ok) {
           setError('Nie udało się załadować wyników.')
           return
         }
-        setData((await res.json()) as ComparisonData)
+        setData((await compRes.json()) as ComparisonData)
+
+        if (annRes.ok) {
+          setAnnotations((await annRes.json()) as AnnotationOut[])
+        }
       } catch {
         setError('Nie udało się połączyć z serwerem.')
       } finally {
@@ -81,6 +116,37 @@ export default function ResultsPage() {
       }
     })()
   }, [id])
+
+  async function handleUpsertAnnotation(body: UpsertAnnotationBody): Promise<void> {
+    const res = await apiFetch(`/api/comparisons/${id}/annotations`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+    if (!res.ok) {
+      const err = (await res.json()) as { detail?: string }
+      throw new Error(err.detail ?? 'Błąd zapisu.')
+    }
+    const saved = (await res.json()) as AnnotationOut
+    setAnnotations((prev) => {
+      const filtered = prev.filter(
+        (a) =>
+          !(
+            a.profile_id === saved.profile_id &&
+            a.chromosome === saved.chromosome &&
+            a.start_position === saved.start_position &&
+            a.end_position === saved.end_position
+          ),
+      )
+      return [...filtered, saved]
+    })
+  }
+
+  async function handleDeleteAnnotation(annotationId: string): Promise<void> {
+    const res = await apiFetch(`/api/annotations/${annotationId}`, { method: 'DELETE' })
+    if (!res.ok) throw new Error('Błąd usunięcia.')
+    setAnnotations((prev) => prev.filter((a) => a.id !== annotationId))
+  }
 
   async function handleDelete() {
     if (!confirm('Usunąć to porównanie?')) return
@@ -141,7 +207,15 @@ export default function ResultsPage() {
 
         <div className="space-y-3">
           {data.pairs.map((pair, i) => (
-            <PairSection key={i} pair={pair} defaultOpen={i === 0} />
+            <PairSection
+              key={i}
+              pair={pair}
+              defaultOpen={i === 0}
+              profiles={data.profiles}
+              annotations={annotations}
+              onAnnotate={handleUpsertAnnotation}
+              onDeleteAnnotation={handleDeleteAnnotation}
+            />
           ))}
         </div>
       </div>

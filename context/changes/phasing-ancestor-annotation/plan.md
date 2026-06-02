@@ -372,30 +372,30 @@ Renderowanie:
 
 #### Automated
 
-- [x] 2.1 `uv run pytest tests/test_annotations_api.py -v` exits 0
-- [x] 2.2 `uv run pytest` exits 0
-- [x] 2.3 `uv run mypy .` exits 0
-- [x] 2.4 `uv run ruff check .` exits 0
-- [x] 2.5 `uv run ruff format --check .` exits 0
+- [x] 2.1 `uv run pytest tests/test_annotations_api.py -v` exits 0 — 94dabfa
+- [x] 2.2 `uv run pytest` exits 0 — 94dabfa
+- [x] 2.3 `uv run mypy .` exits 0 — 94dabfa
+- [x] 2.4 `uv run ruff check .` exits 0 — 94dabfa
+- [x] 2.5 `uv run ruff format --check .` exits 0 — 94dabfa
 
 #### Manual
 
-- [x] 2.6 curl POST /api/comparisons/{id}/annotations → 200 + JSON z id
-- [x] 2.7 curl GET /api/comparisons/{id}/annotations → lista zawierająca adnotację
-- [x] 2.8 curl DELETE /api/annotations/{id} → 204
+- [x] 2.6 curl POST /api/comparisons/{id}/annotations → 200 + JSON z id — 94dabfa
+- [x] 2.7 curl GET /api/comparisons/{id}/annotations → lista zawierająca adnotację — 94dabfa
+- [x] 2.8 curl DELETE /api/annotations/{id} → 204 — 94dabfa
 
 ### Phase 3: Frontend — ResultsPage + SegmentTable + ChromosomeDiagram
 
 #### Automated
 
-- [ ] 3.1 `cd frontend && npx tsc --noEmit` exits 0
-- [ ] 3.2 `uv run pytest` exits 0
+- [x] 3.1 `cd frontend && npx tsc --noEmit` exits 0
+- [x] 3.2 `uv run pytest` exits 0
 
 #### Manual
 
-- [ ] 3.3 Klik segment → formularz z dropdown + strand + pole przodka
-- [ ] 3.4 Zapisz adnotację → badge w tabeli + overlay na diagramie
-- [ ] 3.5 Zmiana osoby w dropdown → pre-fill istniejącej adnotacji lub czyste pola
-- [ ] 3.6 Usuń adnotację → badge i overlay znikają
-- [ ] 3.7 Odświeżenie strony → adnotacje trwałe
-- [ ] 3.8 Błąd sieci przy zapisie → komunikat błędu, formularz nie zamknięty
+- [x] 3.3 Klik segment → formularz z dropdown + strand + pole przodka
+- [x] 3.4 Zapisz adnotację → badge w tabeli + overlay na diagramie
+- [x] 3.5 Zmiana osoby w dropdown → pre-fill istniejącej adnotacji lub czyste pola
+- [x] 3.6 Usuń adnotację → badge i overlay znikają
+- [x] 3.7 Odświeżenie strony → adnotacje trwałe
+- [x] 3.8 Błąd sieci przy zapisie → komunikat błędu, formularz nie zamknięty

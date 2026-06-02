@@ -1,3 +1,13 @@
+export interface AnnotationOut {
+  id: string
+  profile_id: string
+  chromosome: string
+  start_position: number
+  end_position: number
+  strand: 'maternal' | 'paternal'
+  ancestor_label: string
+}
+
 // Human genome reference lengths (hg38), in base pairs
 const HG38_LENGTHS: Record<string, number> = {
   '1': 248956422, '2': 242193529, '3': 198295559, '4': 190214555,
@@ -29,9 +39,10 @@ export interface SegmentOut {
 interface Props {
   segments: SegmentOut[]
   chromosomeLengths?: Record<string, number>
+  annotations?: AnnotationOut[]
 }
 
-export default function ChromosomeDiagram({ segments, chromosomeLengths }: Props) {
+export default function ChromosomeDiagram({ segments, chromosomeLengths, annotations = [] }: Props) {
   const lengths = chromosomeLengths ?? HG38_LENGTHS
 
   // Collect chromosomes that have segments, in natural order
@@ -62,6 +73,16 @@ export default function ChromosomeDiagram({ segments, chromosomeLengths }: Props
       className="block"
       aria-label="Diagram chromosomów"
     >
+      <defs>
+        <pattern
+          id="annotated-stripe"
+          patternUnits="userSpaceOnUse"
+          width="6"
+          height="6"
+        >
+          <line x1="0" y1="6" x2="6" y2="0" stroke="#6366f1" strokeWidth="1.5" />
+        </pattern>
+      </defs>
       {chromsWithData.map((chrom, rowIndex) => {
         const chromLen = lengths[chrom] ?? 1
         const y = rowIndex * ROW_HEIGHT + 2
@@ -92,20 +113,40 @@ export default function ChromosomeDiagram({ segments, chromosomeLengths }: Props
             {chromSegs.map((seg, si) => {
               const x = LABEL_WIDTH + (seg.start_bp / chromLen) * BAR_WIDTH
               const w = Math.max(1, ((seg.end_bp - seg.start_bp) / chromLen) * BAR_WIDTH)
+              const ann = annotations.find(
+                (a) =>
+                  a.chromosome === seg.chromosome &&
+                  a.start_position === seg.start_bp &&
+                  a.end_position === seg.end_bp,
+              )
+              const tooltip = ann
+                ? `Chr${chrom}: ${seg.start_bp.toLocaleString()}–${seg.end_bp.toLocaleString()} bp | ${seg.match_type} | ${seg.snp_count} SNPs | ${ann.ancestor_label} (${ann.strand})`
+                : `Chr${chrom}: ${seg.start_bp.toLocaleString()}–${seg.end_bp.toLocaleString()} bp | ${seg.match_type} | ${seg.snp_count} SNPs`
               return (
-                <rect
-                  key={si}
-                  x={x}
-                  y={y}
-                  width={w}
-                  height={BAR_HEIGHT}
-                  fill={COLORS[seg.match_type] ?? '#9ca3af'}
-                  rx={2}
-                >
-                  <title>
-                    {`Chr${chrom}: ${seg.start_bp.toLocaleString()}–${seg.end_bp.toLocaleString()} bp | ${seg.match_type} | ${seg.snp_count} SNPs`}
-                  </title>
-                </rect>
+                <g key={si}>
+                  <rect
+                    x={x}
+                    y={y}
+                    width={w}
+                    height={BAR_HEIGHT}
+                    fill={COLORS[seg.match_type] ?? '#9ca3af'}
+                    rx={2}
+                  >
+                    <title>{tooltip}</title>
+                  </rect>
+                  {ann && (
+                    <rect
+                      x={x}
+                      y={y}
+                      width={w}
+                      height={BAR_HEIGHT}
+                      fill="url(#annotated-stripe)"
+                      opacity={0.5}
+                      rx={2}
+                      style={{ pointerEvents: 'none' }}
+                    />
+                  )}
+                </g>
               )
             })}
           </g>
