@@ -358,31 +358,31 @@ Renderowanie:
 
 #### Automated
 
-- [x] 1.1 `test -f supabase/migrations/003_ancestor_annotations_unique.sql` exits 0
-- [x] 1.2 `uv run pytest` exits 0
-- [x] 1.3 `uv run mypy .` exits 0
-- [x] 1.4 `uv run ruff check .` exits 0
+- [x] 1.1 `test -f supabase/migrations/003_ancestor_annotations_unique.sql` exits 0 — 441c1ee
+- [x] 1.2 `uv run pytest` exits 0 — 441c1ee
+- [x] 1.3 `uv run mypy .` exits 0 — 441c1ee
+- [x] 1.4 `uv run ruff check .` exits 0 — 441c1ee
 
 #### Manual
 
-- [x] 1.5 Migration applied in Supabase Dashboard without errors
-- [x] 1.6 Table Editor: `ancestor_annotations_unique_segment` index visible
+- [x] 1.5 Migration applied in Supabase Dashboard without errors — 441c1ee
+- [x] 1.6 Table Editor: `ancestor_annotations_unique_segment` index visible — 441c1ee
 
 ### Phase 2: Backend — Router adnotacji
 
 #### Automated
 
-- [ ] 2.1 `uv run pytest tests/test_annotations_api.py -v` exits 0
-- [ ] 2.2 `uv run pytest` exits 0
-- [ ] 2.3 `uv run mypy .` exits 0
-- [ ] 2.4 `uv run ruff check .` exits 0
-- [ ] 2.5 `uv run ruff format --check .` exits 0
+- [x] 2.1 `uv run pytest tests/test_annotations_api.py -v` exits 0
+- [x] 2.2 `uv run pytest` exits 0
+- [x] 2.3 `uv run mypy .` exits 0
+- [x] 2.4 `uv run ruff check .` exits 0
+- [x] 2.5 `uv run ruff format --check .` exits 0
 
 #### Manual
 
-- [ ] 2.6 curl POST /api/comparisons/{id}/annotations → 200 + JSON z id
-- [ ] 2.7 curl GET /api/comparisons/{id}/annotations → lista zawierająca adnotację
-- [ ] 2.8 curl DELETE /api/annotations/{id} → 204
+- [x] 2.6 curl POST /api/comparisons/{id}/annotations → 200 + JSON z id
+- [x] 2.7 curl GET /api/comparisons/{id}/annotations → lista zawierająca adnotację
+- [x] 2.8 curl DELETE /api/annotations/{id} → 204
 
 ### Phase 3: Frontend — ResultsPage + SegmentTable + ChromosomeDiagram
 
