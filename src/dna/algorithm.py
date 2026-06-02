@@ -2,26 +2,57 @@ from itertools import groupby
 
 from src.dna.models import Segment, SNPRecord
 
+# Only standard DNA base characters are valid; anything else (N, -, 0, etc.)
+# marks a low-confidence call and the position is skipped entirely.
+_VALID_ALLELES: frozenset[str] = frozenset("ACGT")
 
-def _classify_pairwise(a: SNPRecord, b: SNPRecord) -> str:
-    sa = {a.allele1, a.allele2}
-    sb = {b.allele1, b.allele2}
-    if sa == sb:
+
+def _classify(snps: list[SNPRecord]) -> str:
+    """Classify co-located SNPs across N people.
+
+    Mirrors DNAPhaser's getSnpMachting logic:
+      FULL  — every person carries the identical (allele1, allele2) pair
+      HALF  — there exists one specific allele carried by every person
+               (i.e. each person has that allele at least once)
+      NONE  — no single allele is shared by all people
+      EMPTY — any person has a non-ACGT allele; caller skips the position
+    """
+    for snp in snps:
+        if snp.allele1 not in _VALID_ALLELES or snp.allele2 not in _VALID_ALLELES:
+            return "EMPTY"
+
+    # FULL: all people have the same sorted genotype tuple
+    g0 = (snps[0].allele1, snps[0].allele2)
+    if all(s.allele1 == g0[0] and s.allele2 == g0[1] for s in snps[1:]):
         return "FULL"
-    if sa & sb:
-        return "HALF"
+
+    # HALF: there is a single allele present in every person's genotype
+    for allele in _VALID_ALLELES:
+        if all(s.allele1 == allele or s.allele2 == allele for s in snps):
+            return "HALF"
+
     return "NONE"
 
 
-def _classify_three_way(a: SNPRecord, b: SNPRecord, c: SNPRecord) -> str:
-    sa = {a.allele1, a.allele2}
-    sb = {b.allele1, b.allele2}
-    sc = {c.allele1, c.allele2}
-    if sa == sb == sc:
-        return "FULL"
-    if sa & sb & sc:
-        return "HALF"
-    return "NONE"
+def _emit_segment(snps: list[SNPRecord], stype: str) -> Segment:
+    first, last = snps[0], snps[-1]
+    start_cm = first.position_cm
+    end_cm = last.position_cm
+    return Segment(
+        chromosome=first.chromosome,
+        match_type=stype,
+        start_bp=first.position_bp,
+        end_bp=last.position_bp,
+        start_cm=start_cm,
+        end_cm=end_cm,
+        length_bp=last.position_bp - first.position_bp,
+        length_cm=(
+            abs(end_cm - start_cm)
+            if start_cm is not None and end_cm is not None
+            else None
+        ),
+        snp_count=len(snps),
+    )
 
 
 def _build_segments(
@@ -30,45 +61,31 @@ def _build_segments(
     max_gap_cm: float | None,
     min_snp_count: int,
 ) -> list[Segment]:
-    """Convert a list of (SNPRecord, match_type) into filtered Segment list."""
+    """Convert (SNPRecord, match_type) pairs into a filtered Segment list.
+
+    Asymmetric filtering (inspired by DNAPhaser's removeInsignificantNotNoneSegments):
+      - NONE segments: always kept (threshold = 1).  Dropping short NONE stretches
+        would merge flanking FULL/HALF regions across real non-matching loci, which
+        is the primary cause of spurious all-FULL output on real data.
+      - FULL / HALF segments: filtered by min_snp_count.
+      - EMPTY positions: silently skipped; they do not break the current segment.
+    """
     segments: list[Segment] = []
     if not classified:
         return segments
 
-    # Group by chromosome first, then do run-length within each chromosome
     def chrom_key(item: tuple[SNPRecord, str]) -> str:
         return item[0].chromosome
 
     for _chrom, chrom_iter in groupby(classified, key=chrom_key):
-        chrom_items = list(chrom_iter)
-
         seg_snps: list[SNPRecord] = []
         seg_type: str = ""
 
-        def flush(snps: list[SNPRecord], stype: str) -> None:
-            if not snps or len(snps) < min_snp_count:
-                return
-            first, last = snps[0], snps[-1]
-            start_cm = first.position_cm
-            end_cm = last.position_cm
-            length_cm: float | None = None
-            if start_cm is not None and end_cm is not None:
-                length_cm = end_cm - start_cm
-            segments.append(
-                Segment(
-                    chromosome=first.chromosome,
-                    match_type=stype,
-                    start_bp=first.position_bp,
-                    end_bp=last.position_bp,
-                    start_cm=start_cm,
-                    end_cm=end_cm,
-                    length_bp=last.position_bp - first.position_bp,
-                    length_cm=length_cm,
-                    snp_count=len(snps),
-                )
-            )
+        for snp, mtype in chrom_iter:
+            if mtype == "EMPTY":
+                # Low-confidence call: skip without breaking the current segment
+                continue
 
-        for snp, mtype in chrom_items:
             if not seg_snps:
                 seg_snps = [snp]
                 seg_type = mtype
@@ -87,13 +104,18 @@ def _build_segments(
             )
 
             if mtype != seg_type or gap_bp_exceeded or gap_cm_exceeded:
-                flush(seg_snps, seg_type)
+                threshold = 1 if seg_type == "NONE" else min_snp_count
+                if len(seg_snps) >= threshold:
+                    segments.append(_emit_segment(seg_snps, seg_type))
                 seg_snps = [snp]
                 seg_type = mtype
             else:
                 seg_snps.append(snp)
 
-        flush(seg_snps, seg_type)
+        if seg_snps:
+            threshold = 1 if seg_type == "NONE" else min_snp_count
+            if len(seg_snps) >= threshold:
+                segments.append(_emit_segment(seg_snps, seg_type))
 
     return segments
 
@@ -118,8 +140,7 @@ def compare_pairwise(
         snp_b = idx_b.get(key)
         if snp_b is None:
             continue
-        mtype = _classify_pairwise(snp_a, snp_b)
-        classified.append((snp_a, mtype))
+        classified.append((snp_a, _classify([snp_a, snp_b])))
 
     return _build_segments(classified, max_gap_bp, max_gap_cm, min_snp_count)
 
@@ -143,7 +164,6 @@ def compare_three_way(
         snp_c = idx_c.get(key)
         if snp_b is None or snp_c is None:
             continue
-        mtype = _classify_three_way(snp_a, snp_b, snp_c)
-        classified.append((snp_a, mtype))
+        classified.append((snp_a, _classify([snp_a, snp_b, snp_c])))
 
     return _build_segments(classified, max_gap_bp, max_gap_cm, min_snp_count)
