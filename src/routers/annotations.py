@@ -144,14 +144,12 @@ def delete_annotation(
 ) -> None:
     db = client.postgrest.auth(current_user.access_token)
 
-    ann_res = (
+    result = (
         db.from_("ancestor_annotations")
-        .select("id")
+        .delete()
         .eq("id", str(annotation_id))
         .eq("user_id", str(current_user.id))
         .execute()
     )
-    if not ann_res.data:
+    if not result.data:
         raise HTTPException(status_code=404, detail="Adnotacja nie znaleziona.")
-
-    db.from_("ancestor_annotations").delete().eq("id", str(annotation_id)).execute()

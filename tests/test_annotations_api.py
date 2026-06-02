@@ -81,10 +81,10 @@ def _ann_table_for_upsert(returned_row: dict[str, object]) -> MagicMock:
 
 def _ann_table_for_delete(found: bool = True) -> MagicMock:
     t = MagicMock()
-    t.select.return_value.eq.return_value.eq.return_value.execute.return_value.data = (
+    # Atomic delete: .delete().eq("id",...).eq("user_id",...).execute()
+    t.delete.return_value.eq.return_value.eq.return_value.execute.return_value.data = (
         [{"id": ANNOTATION_ID}] if found else []
     )
-    t.delete.return_value.eq.return_value.execute.return_value.data = []
     return t
 
 
@@ -177,6 +177,19 @@ def test_delete_annotation_returns_204() -> None:
     response = client.delete(f"/api/annotations/{ANNOTATION_ID}")
 
     assert response.status_code == 204
+
+
+def test_delete_annotation_wrong_user_returns_404() -> None:
+    supabase_mock = _make_db_mock(
+        ancestor_annotations=_ann_table_for_delete(found=False),
+    )
+    app.dependency_overrides[get_current_user] = lambda: FAKE_USER
+    app.dependency_overrides[get_supabase_client] = lambda: supabase_mock
+
+    client = TestClient(app)
+    response = client.delete(f"/api/annotations/{ANNOTATION_ID}")
+
+    assert response.status_code == 404
 
 
 def test_get_annotations_returns_empty_list_when_none_exist() -> None:
