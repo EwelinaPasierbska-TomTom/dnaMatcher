@@ -32,8 +32,8 @@ Pasjonaci genealogii DNA posiadają pliki CSV z wynikami testów kilku członkó
 | F-01 | auth-scaffold               | (foundation) middleware autoryzacji gotowy; tokeny Supabase Auth wydawane i weryfikowane | —                    | FR-001, FR-002, §Access Control | done     |
 | F-02 | database-schema             | (foundation) schemat Supabase wdrożony; tabele profili, wyników segmentów i adnotacji   | F-01                 | FR-003, FR-006, FR-008          | proposed |
 | S-01 | user-authentication         | założyć konto, zalogować się i wylogować                                                | F-01                 | FR-001, FR-002                  | done     |
-| S-02 | dna-profile-upload          | wgrać plik CSV MyHeritage jako profil DNA oraz przeglądać i usuwać profile              | F-01, F-02, S-01     | FR-003, FR-004                  | proposed |
-| S-03 | dna-comparison-engine       | wybrać 2+ profile, uruchomić porównanie i zobaczyć wyniki w tabeli i na diagramie chromosomów | S-02, F-02      | FR-005, FR-006, FR-007, US-01   | proposed |
+| S-02 | dna-profile-upload          | wgrać plik CSV MyHeritage jako profil DNA oraz przeglądać i usuwać profile              | F-01, F-02, S-01     | FR-003, FR-004                  | done     |
+| S-03 | dna-comparison-engine       | wybrać 2+ profile, uruchomić porównanie i zobaczyć wyniki w tabeli i na diagramie chromosomów | S-02, F-02      | FR-005, FR-006, FR-007, US-01   | done     |
 | S-04 | phasing-ancestor-annotation | przypisać segment chromosomu do konkretnego przodka (fazowanie ręczne)                  | S-03                 | FR-008                          | done     |
 
 ## Streams
@@ -110,7 +110,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Unknowns:**
   - Dokładna struktura kolumn eksportu MyHeritage CSV — czy format jest stabilny między wersjami eksportu? — Owner: user. Block: no (do rozwiązania podczas `/10x-plan` przez inspekcję przykładowego pliku CSV).
 - **Risk:** Parser MyHeritage CSV — rdzeń slice'a; §PRD notes "parser jako wymienialny moduł"; błąd parsowania blokuje cały downstream. Izolacja danych: surowy CSV musi być odrzucony po przetworzeniu, nie zapisany (§NFR + §Guardrails)
-- **Status:** proposed
+- **Status:** done
 
 ### S-03: Silnik porównania DNA + wyniki (tabela + diagram) ★ north star
 
@@ -123,7 +123,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Unknowns:**
   - Algorytm klasyfikacji alleli — jak porównywać pozycje SNP gdy dwa profile nie mają identycznego zestawu pozycji chromosomowych? — Owner: user. Block: no (zarys w §Business Logic, szczegóły do rozstrzygnięcia podczas `/10x-plan` przez analizę próbkowych danych)
 - **Risk:** Dwa najważniejsze ryzyka techniczne w jednym slice: (1) poprawność algorytmu klasyfikacji — §Guardrails: "błędna klasyfikacja dyskwalifikuje wynik", wynik musi być deterministyczny; (2) wizualizacja chromosomów (D3.js/Recharts) jest must-have (FR-007) i zwiększa zakres — §Timeline acknowledgment: "user accepted increased risk". Rozważyć podział na dwa etapy w `/10x-plan` (tabela najpierw, diagram jako etap 2 tego samego slice'a)
-- **Status:** proposed
+- **Status:** done
 
 ### S-04: Fazowanie — adnotacja przodka
 
@@ -165,3 +165,5 @@ Brak otwartych pytań — PRD ma wynik 0 otwartych pytań (quality check: accept
 - **F-01: (foundation) middleware autoryzacji gotowy; tokeny Supabase Auth wydawane i weryfikowane** — Archived 2026-05-25 → `context/archive/2026-05-25-auth-scaffold/`. Lesson: —.
 - **S-04: użytkownik może przypisać segment chromosomu do konkretnego przodka (fazowanie ręczne)** — Archived 2026-06-03 → `context/archive/2026-06-02-phasing-ancestor-annotation/`. Lesson: —.
 - **S-01: użytkownik może założyć konto (email + hasło), zalogować się i wylogować** — Archived 2026-06-03 → `context/archive/2026-05-29-user-authentication/`. Lesson: —.
+- **S-02: użytkownik może wgrać plik CSV MyHeritage jako profil DNA oraz przeglądać i usuwać profile** — Archived 2026-06-03 → `context/archive/2026-05-30-dna-comparison/`. Lesson: —.
+- **S-03: użytkownik może wybrać 2+ profile DNA, uruchomić porównanie i zobaczyć wyniki w tabeli i na diagramie chromosomów** — Archived 2026-06-03 → `context/archive/2026-05-30-dna-comparison/`. Lesson: —.
