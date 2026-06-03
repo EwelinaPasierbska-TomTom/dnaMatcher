@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { AnnotationOut, SegmentOut } from './ChromosomeDiagram'
+import type { AncestorOut } from './AncestorPanel'
 
 export interface ProfileMeta {
   id: string
@@ -14,6 +15,7 @@ export interface UpsertAnnotationBody {
   end_position: number
   strand: 'maternal' | 'paternal'
   ancestor_label: string
+  ancestor_id: string | null
 }
 
 const BADGE: Record<string, string> = {
@@ -67,26 +69,36 @@ interface Props {
   segments: SegmentOut[]
   profiles?: ProfileMeta[]
   annotations?: AnnotationOut[]
+  ancestors?: AncestorOut[]
   onAnnotate?: (body: UpsertAnnotationBody) => Promise<void>
   onDeleteAnnotation?: (id: string) => Promise<void>
+  onCreateAncestor?: (name: string, color: string) => Promise<AncestorOut>
 }
 
 export default function SegmentTable({
   segments,
   profiles = [],
   annotations = [],
+  ancestors = [],
   onAnnotate,
   onDeleteAnnotation,
+  onCreateAncestor,
 }: Props) {
   const sorted = [...segments].sort(chromSort)
   const hasCm = sorted.some((s) => s.length_cm !== null)
   const hasDensity = sorted.some((s) => s.density !== null)
   const hasAnnotations = profiles.length > 0 && (onAnnotate !== undefined)
+  const ancestorColorMap: Record<string, string> = Object.fromEntries(
+    ancestors.map((a) => [a.id, a.color]),
+  )
 
   const [expandedRowIdx, setExpandedRowIdx] = useState<number | null>(null)
   const [formProfileId, setFormProfileId] = useState('')
   const [formStrand, setFormStrand] = useState('')
-  const [formLabel, setFormLabel] = useState('')
+  const [formAncestorId, setFormAncestorId] = useState('')
+  // 'new' mode fields
+  const [newAncestorName, setNewAncestorName] = useState('')
+  const [newAncestorColor, setNewAncestorColor] = useState('#f97316')
   const [formSaving, setFormSaving] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
 
@@ -102,7 +114,8 @@ export default function SegmentTable({
     setExpandedRowIdx(idx)
     setFormProfileId(defaultProfileId)
     setFormStrand(existing?.strand ?? '')
-    setFormLabel(existing?.ancestor_label ?? '')
+    setFormAncestorId(existing?.ancestor_id ?? existing?.ancestor_label ?? '')
+    setNewAncestorName('')
     setFormError(null)
   }
 
@@ -110,26 +123,47 @@ export default function SegmentTable({
     const existing = findAnnotation(annotations, profileId, seg)
     setFormProfileId(profileId)
     setFormStrand(existing?.strand ?? '')
-    setFormLabel(existing?.ancestor_label ?? '')
+    setFormAncestorId(existing?.ancestor_id ?? existing?.ancestor_label ?? '')
     setFormError(null)
   }
 
   async function handleSave(seg: SegmentOut) {
-    if (!formProfileId || !formStrand || !formLabel.trim()) {
+    if (!formProfileId || !formStrand) {
       setFormError('Wypełnij wszystkie pola.')
+      return
+    }
+    if (formAncestorId === 'new' && !newAncestorName.trim()) {
+      setFormError('Podaj imię nowego przodka.')
+      return
+    }
+    if (!formAncestorId) {
+      setFormError('Wybierz przodka.')
       return
     }
     if (!onAnnotate) return
     setFormSaving(true)
     setFormError(null)
     try {
+      let resolvedId: string | null = null
+      let resolvedLabel = ''
+      if (formAncestorId === 'new') {
+        if (!onCreateAncestor) throw new Error('Brak obsługi tworzenia przodka.')
+        const created = await onCreateAncestor(newAncestorName.trim(), newAncestorColor)
+        resolvedId = created.id
+        resolvedLabel = created.name
+      } else {
+        const found = ancestors.find((a) => a.id === formAncestorId)
+        resolvedId = formAncestorId
+        resolvedLabel = found?.name ?? formAncestorId
+      }
       await onAnnotate({
         profile_id: formProfileId,
         chromosome: seg.chromosome,
         start_position: seg.start_bp,
         end_position: seg.end_bp,
         strand: formStrand as 'maternal' | 'paternal',
-        ancestor_label: formLabel.trim(),
+        ancestor_label: resolvedLabel,
+        ancestor_id: resolvedId,
       })
       setExpandedRowIdx(null)
     } catch {
@@ -215,6 +249,12 @@ export default function SegmentTable({
                     <td className="py-1.5 pl-4">
                       {badge ? (
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                          {badge.ancestor_id && ancestorColorMap[badge.ancestor_id] && (
+                            <span
+                              className="w-2 h-2 rounded-full flex-shrink-0"
+                              style={{ backgroundColor: ancestorColorMap[badge.ancestor_id] }}
+                            />
+                          )}
                           {badge.ancestor_label}
                           <span className="text-indigo-500">{STRAND_LABEL[badge.strand]}</span>
                         </span>
@@ -260,16 +300,36 @@ export default function SegmentTable({
                           </select>
                         </div>
                         <div className="flex flex-col gap-1 flex-1 min-w-[160px]">
-                          <label className="text-xs text-gray-500">Imię przodka</label>
-                          <input
-                            type="text"
-                            value={formLabel}
-                            onChange={(e) => setFormLabel(e.target.value)}
-                            required
-                            placeholder="np. Babcia Maria"
-                            className="text-sm border border-gray-300 rounded px-2 py-1"
+                          <label className="text-xs text-gray-500">Przodek</label>
+                          <select
+                            value={formAncestorId}
+                            onChange={(e) => {
+                              setFormAncestorId(e.target.value)
+                              setNewAncestorName('')
+                            }}
+                            className="text-sm border border-gray-300 rounded px-2 py-1 bg-white"
                             disabled={formSaving}
-                          />
+                          >
+                            <option value="">— wybierz —</option>
+                            {ancestors.map((a) => (
+                              <option key={a.id} value={a.id}>
+                                {a.name}
+                              </option>
+                            ))}
+                            {onCreateAncestor && (
+                              <option value="new">+ Dodaj nowego…</option>
+                            )}
+                          </select>
+                          {formAncestorId === 'new' && (
+                            <input
+                              type="text"
+                              value={newAncestorName}
+                              onChange={(e) => setNewAncestorName(e.target.value)}
+                              placeholder="Imię przodka"
+                              className="mt-1 text-sm border border-gray-300 rounded px-2 py-1"
+                              disabled={formSaving}
+                            />
+                          )}
                         </div>
                         <button
                           onClick={() => void handleSave(seg)}

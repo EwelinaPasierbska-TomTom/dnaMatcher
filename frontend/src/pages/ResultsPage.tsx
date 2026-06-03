@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import AncestorPanel, { type AncestorOut } from '../components/AncestorPanel'
 import type { AnnotationOut } from '../components/ChromosomeDiagram'
 import ChromosomeDiagram, { type SegmentOut } from '../components/ChromosomeDiagram'
 import SegmentTable, { type ProfileMeta, type UpsertAnnotationBody } from '../components/SegmentTable'
@@ -24,8 +25,10 @@ interface PairSectionProps {
   defaultOpen: boolean
   profiles: ProfileMeta[]
   annotations: AnnotationOut[]
+  ancestors: AncestorOut[]
   onAnnotate: (body: UpsertAnnotationBody) => Promise<void>
   onDeleteAnnotation: (id: string) => Promise<void>
+  onCreateAncestor: (name: string, color: string) => Promise<AncestorOut>
 }
 
 function PairSection({
@@ -33,8 +36,10 @@ function PairSection({
   defaultOpen,
   profiles,
   annotations,
+  ancestors,
   onAnnotate,
   onDeleteAnnotation,
+  onCreateAncestor,
 }: PairSectionProps) {
   const [open, setOpen] = useState(defaultOpen)
   const label =
@@ -59,7 +64,11 @@ function PairSection({
             <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
               Diagram chromosomów
             </h3>
-            <ChromosomeDiagram segments={pair.segments} annotations={annotations} />
+            <ChromosomeDiagram
+              segments={pair.segments}
+              annotations={annotations}
+              ancestors={ancestors}
+            />
           </div>
           <div>
             <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
@@ -69,8 +78,10 @@ function PairSection({
               segments={pair.segments}
               profiles={pairProfiles}
               annotations={annotations}
+              ancestors={ancestors}
               onAnnotate={onAnnotate}
               onDeleteAnnotation={onDeleteAnnotation}
+              onCreateAncestor={onCreateAncestor}
             />
           </div>
         </div>
@@ -87,13 +98,15 @@ export default function ResultsPage() {
   const [error, setError] = useState<string | null>(null)
   const [deleting, setDeleting] = useState(false)
   const [annotations, setAnnotations] = useState<AnnotationOut[]>([])
+  const [ancestors, setAncestors] = useState<AncestorOut[]>([])
 
   useEffect(() => {
     void (async () => {
       try {
-        const [compRes, annRes] = await Promise.all([
+        const [compRes, annRes, ancRes] = await Promise.all([
           apiFetch(`/api/comparisons/${id}`),
           apiFetch(`/api/comparisons/${id}/annotations`),
+          apiFetch('/api/ancestors'),
         ])
 
         if (compRes.status === 404) {
@@ -108,6 +121,9 @@ export default function ResultsPage() {
 
         if (annRes.ok) {
           setAnnotations((await annRes.json()) as AnnotationOut[])
+        }
+        if (ancRes.ok) {
+          setAncestors((await ancRes.json()) as AncestorOut[])
         }
       } catch {
         setError('Nie udało się połączyć z serwerem.')
@@ -148,6 +164,40 @@ export default function ResultsPage() {
     setAnnotations((prev) => prev.filter((a) => a.id !== annotationId))
   }
 
+  async function handleCreateAncestor(name: string, color: string): Promise<AncestorOut> {
+    const res = await apiFetch('/api/ancestors', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, color }),
+    })
+    if (!res.ok) {
+      const err = (await res.json()) as { detail?: string }
+      throw new Error(err.detail ?? 'Błąd tworzenia przodka.')
+    }
+    const created = (await res.json()) as AncestorOut
+    setAncestors((prev) => [...prev, created])
+    return created
+  }
+
+  async function handleUpdateAncestor(id: string, name: string, color: string): Promise<void> {
+    const res = await apiFetch(`/api/ancestors/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, color }),
+    })
+    if (!res.ok) throw new Error('Błąd aktualizacji przodka.')
+    const updated = (await res.json()) as AncestorOut
+    setAncestors((prev) => prev.map((a) => (a.id === id ? updated : a)))
+  }
+
+  async function handleDeleteAncestor(id: string): Promise<void> {
+    const res = await apiFetch(`/api/ancestors/${id}`, { method: 'DELETE' })
+    if (!res.ok) throw new Error('Błąd usunięcia przodka.')
+    setAncestors((prev) => prev.filter((a) => a.id !== id))
+    // CASCADE removed DB annotations — clean up local state too
+    setAnnotations((prev) => prev.filter((a) => a.ancestor_id !== id))
+  }
+
   async function handleDelete() {
     if (!confirm('Usunąć to porównanie?')) return
     setDeleting(true)
@@ -182,41 +232,58 @@ export default function ResultsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-4">
-      <div className="max-w-4xl mx-auto space-y-6">
-        <div className="flex items-start justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">{data.name}</h1>
-            <p className="text-sm text-gray-500 mt-1">{date}</p>
-          </div>
-          <div className="flex gap-3">
-            <button
-              onClick={() => navigate('/app')}
-              className="text-sm text-gray-500 hover:text-gray-700"
-            >
-              ← Powrót
-            </button>
-            <button
-              onClick={() => void handleDelete()}
-              disabled={deleting}
-              className="text-sm text-red-500 hover:text-red-700 disabled:opacity-50"
-            >
-              {deleting ? 'Usuwanie…' : 'Usuń porównanie'}
-            </button>
-          </div>
-        </div>
+      <div className="max-w-5xl mx-auto">
+        <div className="flex gap-6 items-start">
+          {/* main content */}
+          <div className="flex-1 min-w-0 space-y-6">
+            <div className="flex items-start justify-between">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">{data.name}</h1>
+                <p className="text-sm text-gray-500 mt-1">{date}</p>
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => navigate('/app')}
+                  className="text-sm text-gray-500 hover:text-gray-700"
+                >
+                  ← Powrót
+                </button>
+                <button
+                  onClick={() => void handleDelete()}
+                  disabled={deleting}
+                  className="text-sm text-red-500 hover:text-red-700 disabled:opacity-50"
+                >
+                  {deleting ? 'Usuwanie…' : 'Usuń porównanie'}
+                </button>
+              </div>
+            </div>
 
-        <div className="space-y-3">
-          {data.pairs.map((pair, i) => (
-            <PairSection
-              key={i}
-              pair={pair}
-              defaultOpen={i === 0}
-              profiles={data.profiles}
-              annotations={annotations}
-              onAnnotate={handleUpsertAnnotation}
-              onDeleteAnnotation={handleDeleteAnnotation}
+            <div className="space-y-3">
+              {data.pairs.map((pair, i) => (
+                <PairSection
+                  key={i}
+                  pair={pair}
+                  defaultOpen={i === 0}
+                  profiles={data.profiles}
+                  annotations={annotations}
+                  ancestors={ancestors}
+                  onAnnotate={handleUpsertAnnotation}
+                  onDeleteAnnotation={handleDeleteAnnotation}
+                  onCreateAncestor={handleCreateAncestor}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* sidebar */}
+          <div className="w-60 flex-shrink-0 sticky top-10">
+            <AncestorPanel
+              ancestors={ancestors}
+              onAdd={handleCreateAncestor}
+              onUpdate={handleUpdateAncestor}
+              onDelete={handleDeleteAncestor}
             />
-          ))}
+          </div>
         </div>
       </div>
     </div>

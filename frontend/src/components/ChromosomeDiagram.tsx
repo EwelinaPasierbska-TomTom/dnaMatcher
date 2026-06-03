@@ -1,3 +1,5 @@
+import type { AncestorOut } from './AncestorPanel'
+
 export interface AnnotationOut {
   id: string
   profile_id: string
@@ -6,6 +8,7 @@ export interface AnnotationOut {
   end_position: number
   strand: 'maternal' | 'paternal'
   ancestor_label: string
+  ancestor_id: string | null
 }
 
 // Human genome reference lengths (hg38), in base pairs
@@ -41,10 +44,19 @@ interface Props {
   segments: SegmentOut[]
   chromosomeLengths?: Record<string, number>
   annotations?: AnnotationOut[]
+  ancestors?: AncestorOut[]
 }
 
-export default function ChromosomeDiagram({ segments, chromosomeLengths, annotations = [] }: Props) {
+export default function ChromosomeDiagram({
+  segments,
+  chromosomeLengths,
+  annotations = [],
+  ancestors = [],
+}: Props) {
   const lengths = chromosomeLengths ?? HG38_LENGTHS
+  const ancestorColorMap: Record<string, string> = Object.fromEntries(
+    ancestors.map((a) => [a.id, a.color]),
+  )
 
   // Collect chromosomes that have segments, in natural order
   const chromsWithData = [
@@ -141,8 +153,12 @@ export default function ChromosomeDiagram({ segments, chromosomeLengths, annotat
                       y={y}
                       width={w}
                       height={BAR_HEIGHT}
-                      fill="url(#annotated-stripe)"
-                      opacity={0.5}
+                      fill={
+                        ann.ancestor_id && ancestorColorMap[ann.ancestor_id]
+                          ? ancestorColorMap[ann.ancestor_id]
+                          : 'url(#annotated-stripe)'
+                      }
+                      opacity={0.55}
                       rx={2}
                       style={{ pointerEvents: 'none' }}
                     />

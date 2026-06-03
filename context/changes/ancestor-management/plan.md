@@ -264,31 +264,31 @@ Istniejące adnotacje mają `ancestor_id = NULL` — wyświetlane ze starym stri
 
 #### Automated
 
-- [x] 1.1 `uv run pytest` exits 0
-- [x] 1.2 `uv run mypy .` exits 0
-- [x] 1.3 `uv run ruff check .` exits 0
-- [x] 1.4 `uv run ruff format --check .` exits 0
+- [x] 1.1 `uv run pytest` exits 0 — 8d67729
+- [x] 1.2 `uv run mypy .` exits 0 — 8d67729
+- [x] 1.3 `uv run ruff check .` exits 0 — 8d67729
+- [x] 1.4 `uv run ruff format --check .` exits 0 — 8d67729
 
 #### Manual
 
-- [x] 1.5 Migration SQL poprawna przed zastosowaniem
-- [x] 1.6 Migration zastosowana bez błędów
-- [x] 1.7 Tabela `ancestors` widoczna w Table Editor
-- [x] 1.8 Kolumna `ancestor_id` widoczna w `ancestor_annotations`
-- [x] 1.9 `curl /api/ancestors` → `[]` (pusty JSON)
+- [x] 1.5 Migration SQL poprawna przed zastosowaniem — 8d67729
+- [x] 1.6 Migration zastosowana bez błędów — 8d67729
+- [x] 1.7 Tabela `ancestors` widoczna w Table Editor — 8d67729
+- [x] 1.8 Kolumna `ancestor_id` widoczna w `ancestor_annotations` — 8d67729
+- [x] 1.9 `curl /api/ancestors` → `[]` (pusty JSON) — 8d67729
 
 ### Phase 2: Frontend
 
 #### Automated
 
-- [ ] 2.1 `cd frontend && npx tsc --noEmit` exits 0
-- [ ] 2.2 `uv run pytest` exits 0
+- [x] 2.1 `cd frontend && npx tsc --noEmit` exits 0
+- [x] 2.2 `uv run pytest` exits 0
 
 #### Manual
 
-- [ ] 2.3 Panel boczny z przodkami widoczny na stronie wyników
-- [ ] 2.4 Dodanie przodka działa z paletą kolorów
-- [ ] 2.5 Usunięcie przodka usuwa powiązane adnotacje
-- [ ] 2.6 Dropdown w formularzu adnotacji działa
-- [ ] 2.7 ChromosomeDiagram koloruje overlay kolorem przodka
-- [ ] 2.8 Stare adnotacje nadal widoczne ze stripe
+- [x] 2.3 Panel boczny z przodkami widoczny na stronie wyników
+- [x] 2.4 Dodanie przodka działa z paletą kolorów
+- [x] 2.5 Usunięcie przodka usuwa powiązane adnotacje
+- [x] 2.6 Dropdown w formularzu adnotacji działa
+- [x] 2.7 ChromosomeDiagram koloruje overlay kolorem przodka
+- [x] 2.8 Stare adnotacje nadal widoczne ze stripe
