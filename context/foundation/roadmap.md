@@ -31,7 +31,7 @@ Pasjonaci genealogii DNA posiadają pliki CSV z wynikami testów kilku członkó
 |------|-----------------------------|-----------------------------------------------------------------------------------------|----------------------|---------------------------------|----------|
 | F-01 | auth-scaffold               | (foundation) middleware autoryzacji gotowy; tokeny Supabase Auth wydawane i weryfikowane | —                    | FR-001, FR-002, §Access Control | done     |
 | F-02 | database-schema             | (foundation) schemat Supabase wdrożony; tabele profili, wyników segmentów i adnotacji   | F-01                 | FR-003, FR-006, FR-008          | proposed |
-| S-01 | user-authentication         | założyć konto, zalogować się i wylogować                                                | F-01                 | FR-001, FR-002                  | proposed |
+| S-01 | user-authentication         | założyć konto, zalogować się i wylogować                                                | F-01                 | FR-001, FR-002                  | done     |
 | S-02 | dna-profile-upload          | wgrać plik CSV MyHeritage jako profil DNA oraz przeglądać i usuwać profile              | F-01, F-02, S-01     | FR-003, FR-004                  | proposed |
 | S-03 | dna-comparison-engine       | wybrać 2+ profile, uruchomić porównanie i zobaczyć wyniki w tabeli i na diagramie chromosomów | S-02, F-02      | FR-005, FR-006, FR-007, US-01   | proposed |
 | S-04 | phasing-ancestor-annotation | przypisać segment chromosomu do konkretnego przodka (fazowanie ręczne)                  | S-03                 | FR-008                          | done     |
@@ -97,7 +97,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Prosta funkcjonalność, ale błędy walidacji formularza muszą być czytelne dla nietech użytkownika — §Guardrails: "Czytelny komunikat błędu przy nieprawidłowym formacie"
-- **Status:** proposed
+- **Status:** done
 
 ### S-02: Wgrywanie i zarządzanie profilami DNA
 
@@ -164,3 +164,4 @@ Brak otwartych pytań — PRD ma wynik 0 otwartych pytań (quality check: accept
 
 - **F-01: (foundation) middleware autoryzacji gotowy; tokeny Supabase Auth wydawane i weryfikowane** — Archived 2026-05-25 → `context/archive/2026-05-25-auth-scaffold/`. Lesson: —.
 - **S-04: użytkownik może przypisać segment chromosomu do konkretnego przodka (fazowanie ręczne)** — Archived 2026-06-03 → `context/archive/2026-06-02-phasing-ancestor-annotation/`. Lesson: —.
+- **S-01: użytkownik może założyć konto (email + hasło), zalogować się i wylogować** — Archived 2026-06-03 → `context/archive/2026-05-29-user-authentication/`. Lesson: —.

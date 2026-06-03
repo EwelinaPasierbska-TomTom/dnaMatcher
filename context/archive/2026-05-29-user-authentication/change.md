@@ -1,10 +1,10 @@
 ---
 change_id: user-authentication
 title: User Authentication (S-01) — includes F-02 database schema
-status: impl_reviewed
+status: archived
 created: 2026-05-29
-updated: 2026-05-30
-archived_at: null
+updated: 2026-06-03
+archived_at: 2026-06-03T11:18:37Z
 ---
 
 ## Notes
