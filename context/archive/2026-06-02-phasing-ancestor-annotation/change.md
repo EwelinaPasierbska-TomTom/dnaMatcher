@@ -1,10 +1,10 @@
 ---
 change_id: phasing-ancestor-annotation
 title: Phasing — Adnotacja Przodka (S-04)
-status: impl_reviewed
+status: archived
 created: 2026-06-02
-updated: 2026-06-02
-archived_at: null
+updated: 2026-06-03
+archived_at: 2026-06-03T10:18:30Z
 ---
 
 ## Notes

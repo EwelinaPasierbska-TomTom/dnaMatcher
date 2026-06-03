@@ -3,7 +3,7 @@ project: dnaMatcher
 version: 1
 status: draft
 created: 2026-05-25
-updated: 2026-05-25
+updated: 2026-06-03
 prd_version: 1
 main_goal: market-feedback
 top_blocker: time
@@ -34,7 +34,7 @@ Pasjonaci genealogii DNA posiadają pliki CSV z wynikami testów kilku członkó
 | S-01 | user-authentication         | założyć konto, zalogować się i wylogować                                                | F-01                 | FR-001, FR-002                  | proposed |
 | S-02 | dna-profile-upload          | wgrać plik CSV MyHeritage jako profil DNA oraz przeglądać i usuwać profile              | F-01, F-02, S-01     | FR-003, FR-004                  | proposed |
 | S-03 | dna-comparison-engine       | wybrać 2+ profile, uruchomić porównanie i zobaczyć wyniki w tabeli i na diagramie chromosomów | S-02, F-02      | FR-005, FR-006, FR-007, US-01   | proposed |
-| S-04 | phasing-ancestor-annotation | przypisać segment chromosomu do konkretnego przodka (fazowanie ręczne)                  | S-03                 | FR-008                          | proposed |
+| S-04 | phasing-ancestor-annotation | przypisać segment chromosomu do konkretnego przodka (fazowanie ręczne)                  | S-03                 | FR-008                          | done     |
 
 ## Streams
 
@@ -135,7 +135,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Zakres dobrze zdefiniowany — ręczna adnotacja, nie automatyczne fazowanie (§Non-Goals). Ryzyko UX: jak elegancko zezwolić na przypisanie segmentów do różnych przodków bezpośrednio z diagramu chromosomów
-- **Status:** proposed
+- **Status:** done
 
 ## Backlog Handoff
 
@@ -163,3 +163,4 @@ Brak otwartych pytań — PRD ma wynik 0 otwartych pytań (quality check: accept
 ## Done
 
 - **F-01: (foundation) middleware autoryzacji gotowy; tokeny Supabase Auth wydawane i weryfikowane** — Archived 2026-05-25 → `context/archive/2026-05-25-auth-scaffold/`. Lesson: —.
+- **S-04: użytkownik może przypisać segment chromosomu do konkretnego przodka (fazowanie ręczne)** — Archived 2026-06-03 → `context/archive/2026-06-02-phasing-ancestor-annotation/`. Lesson: —.
