@@ -36,6 +36,7 @@ class SegmentOut(BaseModel):
     length_bp: int
     length_cm: float | None
     snp_count: int
+    density: float | None
 
 
 class PairResult(BaseModel):
@@ -82,6 +83,7 @@ def _segment_to_row(
         "end_cm": seg.end_cm,
         "length_bp": seg.length_bp,
         "length_cm": seg.length_cm,
+        "density": seg.density,
         "pair_profile_ids": pair_profile_ids,
     }
 
@@ -105,6 +107,7 @@ def _segments_to_pair_result(
                 length_bp=s.length_bp,
                 length_cm=s.length_cm,
                 snp_count=s.snp_count,
+                density=s.density,
             )
             for s in segments
         ],
@@ -345,6 +348,7 @@ def get_comparison(
             length_bp=row.get("length_bp", 0),
             length_cm=row.get("length_cm"),
             snp_count=row["snp_count"],
+            density=row.get("density"),
         )
         pair_map.setdefault(key, []).append(seg)
 

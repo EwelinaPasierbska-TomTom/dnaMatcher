@@ -21,3 +21,4 @@ class Segment:
     length_bp: int
     length_cm: float | None
     snp_count: int
+    density: float | None

@@ -38,6 +38,11 @@ def _emit_segment(snps: list[SNPRecord], stype: str) -> Segment:
     first, last = snps[0], snps[-1]
     start_cm = first.position_cm
     end_cm = last.position_cm
+    length_cm = (
+        abs(end_cm - start_cm) if start_cm is not None and end_cm is not None else None
+    )
+    snp_count = len(snps)
+    density = snp_count / length_cm if length_cm and length_cm > 0 else None
     return Segment(
         chromosome=first.chromosome,
         match_type=stype,
@@ -46,12 +51,9 @@ def _emit_segment(snps: list[SNPRecord], stype: str) -> Segment:
         start_cm=start_cm,
         end_cm=end_cm,
         length_bp=last.position_bp - first.position_bp,
-        length_cm=(
-            abs(end_cm - start_cm)
-            if start_cm is not None and end_cm is not None
-            else None
-        ),
-        snp_count=len(snps),
+        length_cm=length_cm,
+        snp_count=snp_count,
+        density=density,
     )
 
 

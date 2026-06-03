@@ -1,3 +1,5 @@
+import pytest
+
 from src.dna.algorithm import compare_pairwise, compare_three_way
 from src.dna.models import SNPRecord
 
@@ -175,3 +177,30 @@ def test_segment_length_bp() -> None:
     assert segs[0].length_bp == 4000  # 5000 - 1000
     assert segs[0].start_bp == 1000
     assert segs[0].end_bp == 5000
+
+
+def _snp_cm(chrom: str, pos_bp: int, pos_cm: float, g: str) -> SNPRecord:
+    a, b = sorted(g)
+    return SNPRecord(
+        chromosome=chrom, position_bp=pos_bp, position_cm=pos_cm, allele1=a, allele2=b
+    )
+
+
+def test_segment_length_cm_and_density() -> None:
+    # 10 FULL SNPs, position_cm from 10.0 to 19.0 (step 1.0)
+    a = [_snp_cm("1", (i + 1) * 1000, 10.0 + i, "AA") for i in range(10)]
+    b = [_snp_cm("1", (i + 1) * 1000, 10.0 + i, "AA") for i in range(10)]
+    segs = compare_pairwise(a, b, min_snp_count=1)
+    assert len(segs) == 1
+    seg = segs[0]
+    assert seg.length_cm == pytest.approx(9.0)  # abs(19.0 - 10.0)
+    assert seg.density == pytest.approx(10 / 9.0)  # snp_count / length_cm
+
+
+def test_segment_density_none_when_no_cm_data() -> None:
+    # SNPs with position_cm=None → density must be None
+    a = [_snp("1", i * 1000, "AA", f"rs{i}") for i in range(1, 6)]
+    b = [_snp("1", i * 1000, "AA", f"rs{i}") for i in range(1, 6)]
+    segs = compare_pairwise(a, b, min_snp_count=1)
+    assert segs[0].length_cm is None
+    assert segs[0].density is None
