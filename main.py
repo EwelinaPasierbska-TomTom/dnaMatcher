@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
+from src.routers import ancestors as ancestors_router
 from src.routers import annotations as annotations_router
 from src.routers import comparisons as comparisons_router
 from src.routers import me as me_router
@@ -26,6 +27,7 @@ api_router = APIRouter(prefix="/api")
 api_router.include_router(me_router.router)
 api_router.include_router(comparisons_router.router)
 api_router.include_router(annotations_router.router)
+api_router.include_router(ancestors_router.router)
 app.include_router(api_router)
 
 

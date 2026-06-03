@@ -24,6 +24,7 @@ class AnnotationIn(BaseModel):
     end_position: int
     strand: Literal["maternal", "paternal"]
     ancestor_label: str
+    ancestor_id: UUID | None = None
 
 
 class AnnotationOut(BaseModel):
@@ -34,6 +35,7 @@ class AnnotationOut(BaseModel):
     end_position: int
     strand: str
     ancestor_label: str
+    ancestor_id: UUID | None
     created_at: str
 
 
@@ -43,6 +45,7 @@ class AnnotationOut(BaseModel):
 
 
 def _row_to_out(row: dict[str, object]) -> AnnotationOut:
+    raw_ancestor_id = row.get("ancestor_id")
     return AnnotationOut(
         id=UUID(str(row["id"])),
         profile_id=UUID(str(row["profile_id"])),
@@ -51,6 +54,7 @@ def _row_to_out(row: dict[str, object]) -> AnnotationOut:
         end_position=int(str(row["end_position"])),
         strand=str(row["strand"]),
         ancestor_label=str(row["ancestor_label"]),
+        ancestor_id=UUID(str(raw_ancestor_id)) if raw_ancestor_id else None,
         created_at=str(row["created_at"]),
     )
 
@@ -124,6 +128,7 @@ def upsert_annotation(
         "end_position": body.end_position,
         "strand": body.strand,
         "ancestor_label": body.ancestor_label,
+        "ancestor_id": str(body.ancestor_id) if body.ancestor_id else None,
     }
     result = (
         db.from_("ancestor_annotations")
