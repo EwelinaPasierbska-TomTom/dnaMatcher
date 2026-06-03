@@ -42,6 +42,7 @@ def _emit_segment(snps: list[SNPRecord], stype: str) -> Segment:
         abs(end_cm - start_cm) if start_cm is not None and end_cm is not None else None
     )
     snp_count = len(snps)
+    # None check must precede > 0: `None > 0` raises TypeError in Python.
     density = snp_count / length_cm if length_cm and length_cm > 0 else None
     return Segment(
         chromosome=first.chromosome,
