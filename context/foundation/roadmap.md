@@ -30,7 +30,7 @@ Pasjonaci genealogii DNA posiadają pliki CSV z wynikami testów kilku członkó
 | ID   | Change ID                   | Outcome (użytkownik może …)                                                             | Prerequisites        | PRD refs                        | Status   |
 |------|-----------------------------|-----------------------------------------------------------------------------------------|----------------------|---------------------------------|----------|
 | F-01 | auth-scaffold               | (foundation) middleware autoryzacji gotowy; tokeny Supabase Auth wydawane i weryfikowane | —                    | FR-001, FR-002, §Access Control | done     |
-| F-02 | database-schema             | (foundation) schemat Supabase wdrożony; tabele profili, wyników segmentów i adnotacji   | F-01                 | FR-003, FR-006, FR-008          | proposed |
+| F-02 | database-schema             | (foundation) schemat Supabase wdrożony; tabele profili, wyników segmentów i adnotacji   | F-01                 | FR-003, FR-006, FR-008          | done     |
 | S-01 | user-authentication         | założyć konto, zalogować się i wylogować                                                | F-01                 | FR-001, FR-002                  | done     |
 | S-02 | dna-profile-upload          | wgrać plik CSV MyHeritage jako profil DNA oraz przeglądać i usuwać profile              | F-01, F-02, S-01     | FR-003, FR-004                  | done     |
 | S-03 | dna-comparison-engine       | wybrać 2+ profile, uruchomić porównanie i zobaczyć wyniki w tabeli i na diagramie chromosomów | S-02, F-02      | FR-005, FR-006, FR-007, US-01   | done     |
@@ -83,7 +83,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Schemat musi odzwierciedlać NFR o prywatności — surowe dane CSV nigdy nie trafiają do bazy; błąd projektowy tu wymaga późniejszej migracji
-- **Status:** proposed
+- **Status:** done
 
 ## Slices
 
@@ -167,3 +167,4 @@ Brak otwartych pytań — PRD ma wynik 0 otwartych pytań (quality check: accept
 - **S-01: użytkownik może założyć konto (email + hasło), zalogować się i wylogować** — Archived 2026-06-03 → `context/archive/2026-05-29-user-authentication/`. Lesson: —.
 - **S-02: użytkownik może wgrać plik CSV MyHeritage jako profil DNA oraz przeglądać i usuwać profile** — Archived 2026-06-03 → `context/archive/2026-05-30-dna-comparison/`. Lesson: —.
 - **S-03: użytkownik może wybrać 2+ profile DNA, uruchomić porównanie i zobaczyć wyniki w tabeli i na diagramie chromosomów** — Archived 2026-06-03 → `context/archive/2026-05-30-dna-comparison/`. Lesson: —.
+- **F-02: (foundation) schemat Supabase wdrożony; tabele profili, wyników segmentów i adnotacji** — Archived 2026-06-03 → `context/archive/2026-05-25-database-schema/`. Lesson: —.
