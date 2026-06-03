@@ -35,6 +35,12 @@ Pasjonaci genealogii DNA posiadają pliki CSV z wynikami testów kilku członkó
 | S-02 | dna-profile-upload          | wgrać plik CSV MyHeritage jako profil DNA oraz przeglądać i usuwać profile              | F-01, F-02, S-01     | FR-003, FR-004                  | done     |
 | S-03 | dna-comparison-engine       | wybrać 2+ profile, uruchomić porównanie i zobaczyć wyniki w tabeli i na diagramie chromosomów | S-02, F-02      | FR-005, FR-006, FR-007, US-01   | done     |
 | S-04 | phasing-ancestor-annotation | przypisać segment chromosomu do konkretnego przodka (fazowanie ręczne)                  | S-03                 | FR-008                          | done     |
+| S-05 | canvas-visualization        | widzieć chromosomy jako interaktywny diagram canvas z torami podobieństwa i fazowania   | S-04                 | FR-007                          | proposed |
+| S-06 | ancestor-management         | definiować nazwanych przodków z kolorami per porównanie i używać ich wielokrotnie        | S-04                 | FR-008                          | proposed |
+| S-07 | phasing-click               | kliknąć tor chromosomu i przypisać segment do przodka bez formularza                    | S-05, S-06           | FR-008                          | proposed |
+| S-08 | segment-cm-density          | widzieć długość segmentu w cM i gęstość SNP/cM obok każdego segmentu                   | S-03                 | FR-006                          | proposed |
+| S-09 | external-similarities       | rejestrować zewnętrzne dopasowania DNA z klastrami i widzieć je na diagramie            | S-05                 | —                               | proposed |
+| S-10 | report-export               | eksportować raport HTML i zrzut JPG z wizualizacją chromosomów                          | S-05                 | FR-009                          | proposed |
 
 ## Streams
 
@@ -44,6 +50,8 @@ Navigation aid — groups items that share a Prerequisites chain. Canonical orde
 |--------|--------------------|------------------------------------------  |-------------------------------------------------------------------------------|
 | A      | Auth & dostęp      | `F-01` → `S-01`                            | Brama do produktu; F-01 gotowy do planowania od razu. S-01 równolegle z F-02. |
 | B      | Dane & produkt     | `F-02` → `S-02` → `S-03` → `S-04`         | Dołącza do Streamu A przy S-02 (wymaga F-01 i S-01 ze Streamu A).             |
+| C      | Wizualizacja v2    | `S-08` → `S-06` → `S-05` → `S-07`         | Przebudowa widoku wyników: dane cM, przodkowie, canvas, phasing click.        |
+| D      | Rozszerzenia       | `S-05` → `S-09` → `S-10`                  | Zewnętrzne dopasowania i eksport; zależą od canvas (S-05).                    |
 
 ## Baseline
 
@@ -137,6 +145,78 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Risk:** Zakres dobrze zdefiniowany — ręczna adnotacja, nie automatyczne fazowanie (§Non-Goals). Ryzyko UX: jak elegancko zezwolić na przypisanie segmentów do różnych przodków bezpośrednio z diagramu chromosomów
 - **Status:** done
 
+### S-05: Interaktywna wizualizacja chromosomów (Canvas)
+
+- **Outcome:** użytkownik widzi chromosomy jako interaktywny diagram canvas z torami podobieństwa (no/half/full match) i torami fazowania per osoba (maternal/paternal), dla 3 osób — wszystkie 3 pary jednocześnie
+- **Change ID:** canvas-visualization
+- **PRD refs:** FR-007
+- **Prerequisites:** S-04
+- **Parallel with:** S-08 (S-08 niezależne, można równolegle)
+- **Blockers:** —
+- **Unknowns:** —
+- **Risk:** Największa zmiana wizualna — zastępuje istniejący SVG ChromosomeDiagram; canvas hit-testing wymaga precyzyjnej implementacji
+- **Status:** proposed
+
+### S-06: Zarządzanie przodkami
+
+- **Outcome:** użytkownik definiuje nazwanych przodków z kolorami per porównanie i używa ich wielokrotnie przy fazowaniu
+- **Change ID:** ancestor-management
+- **PRD refs:** FR-008
+- **Prerequisites:** S-04
+- **Parallel with:** S-05 (można budować równolegle)
+- **Blockers:** —
+- **Unknowns:** —
+- **Risk:** Wymaga migracji istniejących adnotacji `ancestor_label` (wolny tekst) na FK do nowej tabeli `ancestors`
+- **Status:** proposed
+
+### S-07: Fazowanie przez kliknięcie na diagramie
+
+- **Outcome:** użytkownik klika tor chromosomu i przypisuje segment do nazwanego przodka bez formularza; istniejące fazowanie edytowalne w miejscu
+- **Change ID:** phasing-click
+- **PRD refs:** FR-008
+- **Prerequisites:** S-05, S-06
+- **Parallel with:** —
+- **Blockers:** —
+- **Unknowns:** —
+- **Risk:** Canvas hit-testing musi być zsynchronizowany z modelem danych przodków z S-06
+- **Status:** proposed
+
+### S-08: Szczegóły segmentów — cM i gęstość SNP
+
+- **Outcome:** użytkownik widzi długość segmentu w centiMorganach (cM) i gęstość SNP/cM w tabeli i tooltipach diagramu
+- **Change ID:** segment-cm-density
+- **PRD refs:** FR-006
+- **Prerequisites:** S-03
+- **Parallel with:** S-06
+- **Blockers:** —
+- **Unknowns:** Czy parser CSV MyHeritage dostarcza dane cM — do weryfikacji podczas planowania
+- **Risk:** Niskie; jeśli parser nie dostarcza cM, pola pozostają null i wyświetlane jako „—"
+- **Status:** proposed
+
+### S-09: Zewnętrzne dopasowania DNA
+
+- **Outcome:** użytkownik rejestruje zewnętrzne dopasowania DNA (z innych baz) z pozycją, relacją i klastrami, widzi je na diagramie canvas
+- **Change ID:** external-similarities
+- **PRD refs:** —
+- **Prerequisites:** S-05
+- **Parallel with:** S-10
+- **Blockers:** —
+- **Unknowns:** —
+- **Risk:** Nowa tabela i endpointy; integracja z canvas wymaga osobnej warstwy renderowania
+- **Status:** proposed
+
+### S-10: Eksport raportu
+
+- **Outcome:** użytkownik eksportuje samodzielny raport HTML i zrzut JPG z wizualizacją chromosomów
+- **Change ID:** report-export
+- **PRD refs:** FR-009
+- **Prerequisites:** S-05
+- **Parallel with:** S-09
+- **Blockers:** —
+- **Unknowns:** —
+- **Risk:** Eksport HTML generowany client-side; canvas-to-JPG działa tylko gdy canvas jest wyrenderowany w DOM
+- **Status:** proposed
+
 ## Backlog Handoff
 
 | Roadmap ID | Change ID                   | Suggested issue title                                                          | Ready for `/10x-plan` | Notes                                      |
@@ -147,6 +227,12 @@ Foundations below assume these are present and do NOT re-scaffold them.
 | S-02       | dna-profile-upload          | DNA profile upload: parser MyHeritage CSV + zarządzanie profilami              | no                    | Czeka na F-01, F-02, S-01                  |
 | S-03       | dna-comparison-engine       | DNA comparison engine: klasyfikator alleli + tabela segmentów + diagram chromosomów | no               | Czeka na S-02, F-02 — gwiazda przewodnia   |
 | S-04       | phasing-ancestor-annotation | Phasing: ręczna adnotacja segmentu chromosomu przodkiem                        | no                    | Czeka na S-03                              |
+| S-08       | segment-cm-density          | Segmenty: długość cM + gęstość SNP/cM w tabeli i tooltipach                   | yes                   | Pierwsze w kolejności (Stream C)           |
+| S-06       | ancestor-management         | Przodkowie: nazwani przodkowie z kolorami per porównanie                       | no                    | Czeka na S-04                              |
+| S-05       | canvas-visualization        | Wizualizacja canvas: tory podobieństwa + fazowania, 3-pair view                | no                    | Czeka na S-06 (kolory przodków)            |
+| S-07       | phasing-click               | Phasing click: kliknięcie toru → przypisanie przodka                          | no                    | Czeka na S-05 + S-06                       |
+| S-09       | external-similarities       | Zewnętrzne dopasowania DNA z klastrami                                        | no                    | Czeka na S-05                              |
+| S-10       | report-export               | Eksport HTML + JPG                                                            | no                    | Czeka na S-05                              |
 
 ## Open Roadmap Questions
 
