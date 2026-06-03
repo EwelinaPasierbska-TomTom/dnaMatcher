@@ -38,7 +38,7 @@ Pasjonaci genealogii DNA posiadają pliki CSV z wynikami testów kilku członkó
 | S-05 | canvas-visualization        | widzieć chromosomy jako interaktywny diagram canvas z torami podobieństwa i fazowania   | S-04                 | FR-007                          | proposed |
 | S-06 | ancestor-management         | definiować nazwanych przodków z kolorami per porównanie i używać ich wielokrotnie        | S-04                 | FR-008                          | proposed |
 | S-07 | phasing-click               | kliknąć tor chromosomu i przypisać segment do przodka bez formularza                    | S-05, S-06           | FR-008                          | proposed |
-| S-08 | segment-cm-density          | widzieć długość segmentu w cM i gęstość SNP/cM obok każdego segmentu                   | S-03                 | FR-006                          | proposed |
+| S-08 | segment-cm-density          | widzieć długość segmentu w cM i gęstość SNP/cM obok każdego segmentu                   | S-03                 | FR-006                          | done     |
 | S-09 | external-similarities       | rejestrować zewnętrzne dopasowania DNA z klastrami i widzieć je na diagramie            | S-05                 | —                               | proposed |
 | S-10 | report-export               | eksportować raport HTML i zrzut JPG z wizualizacją chromosomów                          | S-05                 | FR-009                          | proposed |
 
@@ -191,7 +191,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** Czy parser CSV MyHeritage dostarcza dane cM — do weryfikacji podczas planowania
 - **Risk:** Niskie; jeśli parser nie dostarcza cM, pola pozostają null i wyświetlane jako „—"
-- **Status:** proposed
+- **Status:** done
 
 ### S-09: Zewnętrzne dopasowania DNA
 
@@ -254,3 +254,4 @@ Brak otwartych pytań — PRD ma wynik 0 otwartych pytań (quality check: accept
 - **S-02: użytkownik może wgrać plik CSV MyHeritage jako profil DNA oraz przeglądać i usuwać profile** — Archived 2026-06-03 → `context/archive/2026-05-30-dna-comparison/`. Lesson: —.
 - **S-03: użytkownik może wybrać 2+ profile DNA, uruchomić porównanie i zobaczyć wyniki w tabeli i na diagramie chromosomów** — Archived 2026-06-03 → `context/archive/2026-05-30-dna-comparison/`. Lesson: —.
 - **F-02: (foundation) schemat Supabase wdrożony; tabele profili, wyników segmentów i adnotacji** — Archived 2026-06-03 → `context/archive/2026-05-25-database-schema/`. Lesson: —.
+- **S-08: użytkownik widzi długość segmentu w cM i gęstość SNP/cM obok każdego segmentu** — Archived 2026-06-03 → `context/archive/2026-06-03-segment-cm-density/`. Lesson: —.
