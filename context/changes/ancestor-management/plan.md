@@ -281,14 +281,14 @@ Istniejące adnotacje mają `ancestor_id = NULL` — wyświetlane ze starym stri
 
 #### Automated
 
-- [x] 2.1 `cd frontend && npx tsc --noEmit` exits 0
-- [x] 2.2 `uv run pytest` exits 0
+- [x] 2.1 `cd frontend && npx tsc --noEmit` exits 0 — 7f61b5c
+- [x] 2.2 `uv run pytest` exits 0 — 7f61b5c
 
 #### Manual
 
-- [x] 2.3 Panel boczny z przodkami widoczny na stronie wyników
-- [x] 2.4 Dodanie przodka działa z paletą kolorów
-- [x] 2.5 Usunięcie przodka usuwa powiązane adnotacje
-- [x] 2.6 Dropdown w formularzu adnotacji działa
-- [x] 2.7 ChromosomeDiagram koloruje overlay kolorem przodka
-- [x] 2.8 Stare adnotacje nadal widoczne ze stripe
+- [x] 2.3 Panel boczny z przodkami widoczny na stronie wyników — 7f61b5c
+- [x] 2.4 Dodanie przodka działa z paletą kolorów — 7f61b5c
+- [x] 2.5 Usunięcie przodka usuwa powiązane adnotacje — 7f61b5c
+- [x] 2.6 Dropdown w formularzu adnotacji działa — 7f61b5c
+- [x] 2.7 ChromosomeDiagram koloruje overlay kolorem przodka — 7f61b5c
+- [x] 2.8 Stare adnotacje nadal widoczne ze stripe — 7f61b5c
