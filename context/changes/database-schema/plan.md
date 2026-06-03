@@ -225,11 +225,11 @@ indexes, and RLS policies exist and behave correctly.
 ### Phase 1: SQL migration file
 
 #### Automated
-- [ ] 1.1 Create supabase/migrations/001_initial_schema.sql
-- [ ] 1.2 Verify grep checks pass (4 tables, 4 RLS enables, 15 policies)
-- [ ] 1.3 uv run pytest passes
-- [ ] 1.4 uv run mypy . passes
-- [ ] 1.5 uv run ruff check . passes
+- [x] 1.1 Create supabase/migrations/001_initial_schema.sql — d753d1f
+- [x] 1.2 Verify grep checks pass (4 tables, 4 RLS enables, 15 policies) — d753d1f
+- [x] 1.3 uv run pytest passes — d753d1f
+- [x] 1.4 uv run mypy . passes — d753d1f
+- [x] 1.5 uv run ruff check . passes — d753d1f
 
 #### Manual
 - (none)
@@ -240,8 +240,8 @@ indexes, and RLS policies exist and behave correctly.
 - (none)
 
 #### Manual
-- [ ] 2.1 Apply SQL via Supabase Dashboard SQL Editor — no errors
-- [ ] 2.2 Table Editor: all 4 tables visible
-- [ ] 2.3 Policies: RLS enabled on all 4 tables with correct policies
-- [ ] 2.4 Anonymous SELECT returns 0 rows (not error)
-- [ ] 2.5 Anonymous INSERT blocked by RLS policy error
+- [x] 2.1 Apply SQL via Supabase Dashboard SQL Editor — no errors — d753d1f
+- [x] 2.2 Table Editor: all 4 tables visible — d753d1f
+- [x] 2.3 Policies: RLS enabled on all 4 tables with correct policies — d753d1f
+- [x] 2.4 Anonymous SELECT returns 0 rows (not error) — d753d1f
+- [x] 2.5 Anonymous INSERT blocked by RLS policy error — d753d1f
