@@ -217,12 +217,12 @@ Dodanie `density` do interfejsu TypeScript i renderowanie nowej kolumny w `Segme
 
 #### Automated
 
-- [x] 2.1 `cd frontend && npx tsc --noEmit` exits 0
-- [x] 2.2 `uv run pytest` exits 0
+- [x] 2.1 `cd frontend && npx tsc --noEmit` exits 0 — 9cef9a0
+- [x] 2.2 `uv run pytest` exits 0 — 9cef9a0
 
 #### Manual
 
-- [x] 2.3 Kolumna `Gęstość (SNP/cM)` widoczna dla CSV z danymi cM
-- [x] 2.4 Kolumna ukryta dla CSV bez danych cM
-- [x] 2.5 Wartości z 1 miejscem dziesiętnym, brakujące jako `—`
-- [x] 2.6 Brak regresji w istniejących kolumnach
+- [x] 2.3 Kolumna `Gęstość (SNP/cM)` widoczna dla CSV z danymi cM — 9cef9a0
+- [x] 2.4 Kolumna ukryta dla CSV bez danych cM — 9cef9a0
+- [x] 2.5 Wartości z 1 miejscem dziesiętnym, brakujące jako `—` — 9cef9a0
+- [x] 2.6 Brak regresji w istniejących kolumnach — 9cef9a0
