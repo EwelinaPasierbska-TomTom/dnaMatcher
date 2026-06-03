@@ -1,7 +1,7 @@
 ---
 change_id: segment-cm-density
 title: Segment cM length and SNP/cM density display
-status: implemented
+status: impl_reviewed
 created: 2026-06-03
 updated: 2026-06-03
 archived_at: null
