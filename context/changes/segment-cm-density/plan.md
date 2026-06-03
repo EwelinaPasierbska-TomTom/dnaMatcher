@@ -201,28 +201,28 @@ Dodanie `density` do interfejsu TypeScript i renderowanie nowej kolumny w `Segme
 
 #### Automated
 
-- [x] 1.1 `uv run pytest` exits 0
-- [x] 1.2 `uv run mypy .` exits 0
-- [x] 1.3 `uv run ruff check .` exits 0
-- [x] 1.4 `uv run ruff format --check .` exits 0
-- [x] 1.5 `test_dna_algorithm.py` zawiera min. 2 nowe testy density
+- [x] 1.1 `uv run pytest` exits 0 — 2daf2d4
+- [x] 1.2 `uv run mypy .` exits 0 — 2daf2d4
+- [x] 1.3 `uv run ruff check .` exits 0 — 2daf2d4
+- [x] 1.4 `uv run ruff format --check .` exits 0 — 2daf2d4
+- [x] 1.5 `test_dna_algorithm.py` zawiera min. 2 nowe testy density — 2daf2d4
 
 #### Manual
 
-- [x] 1.6 Migration SQL wygląda poprawnie
-- [x] 1.7 Migration zastosowana w Supabase Dashboard bez błędów
-- [x] 1.8 Kolumna `density` widoczna w Table Editor
+- [x] 1.6 Migration SQL wygląda poprawnie — 2daf2d4
+- [x] 1.7 Migration zastosowana w Supabase Dashboard bez błędów — 2daf2d4
+- [x] 1.8 Kolumna `density` widoczna w Table Editor — 2daf2d4
 
 ### Phase 2: Frontend — kolumna Gęstość (SNP/cM)
 
 #### Automated
 
-- [ ] 2.1 `cd frontend && npx tsc --noEmit` exits 0
-- [ ] 2.2 `uv run pytest` exits 0
+- [x] 2.1 `cd frontend && npx tsc --noEmit` exits 0
+- [x] 2.2 `uv run pytest` exits 0
 
 #### Manual
 
-- [ ] 2.3 Kolumna `Gęstość (SNP/cM)` widoczna dla CSV z danymi cM
-- [ ] 2.4 Kolumna ukryta dla CSV bez danych cM
-- [ ] 2.5 Wartości z 1 miejscem dziesiętnym, brakujące jako `—`
-- [ ] 2.6 Brak regresji w istniejących kolumnach
+- [x] 2.3 Kolumna `Gęstość (SNP/cM)` widoczna dla CSV z danymi cM
+- [x] 2.4 Kolumna ukryta dla CSV bez danych cM
+- [x] 2.5 Wartości z 1 miejscem dziesiętnym, brakujące jako `—`
+- [x] 2.6 Brak regresji w istniejących kolumnach

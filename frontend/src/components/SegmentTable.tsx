@@ -80,6 +80,7 @@ export default function SegmentTable({
 }: Props) {
   const sorted = [...segments].sort(chromSort)
   const hasCm = sorted.some((s) => s.length_cm !== null)
+  const hasDensity = sorted.some((s) => s.density !== null)
   const hasAnnotations = profiles.length > 0 && (onAnnotate !== undefined)
 
   const [expandedRowIdx, setExpandedRowIdx] = useState<number | null>(null)
@@ -89,7 +90,7 @@ export default function SegmentTable({
   const [formSaving, setFormSaving] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
 
-  const totalCols = 7 + (hasCm ? 1 : 0) + (hasAnnotations ? 1 : 0)
+  const totalCols = 7 + (hasCm ? 1 : 0) + (hasDensity ? 1 : 0) + (hasAnnotations ? 1 : 0)
 
   function openRow(idx: number, seg: SegmentOut) {
     if (expandedRowIdx === idx) {
@@ -166,6 +167,7 @@ export default function SegmentTable({
             <th className="py-2 pr-4">Koniec (bp)</th>
             <th className="py-2 pr-4">Dł. (bp)</th>
             {hasCm && <th className="py-2 pr-4">Dł. (cM)</th>}
+            {hasDensity && <th className="py-2 pr-4">Gęstość (SNP/cM)</th>}
             <th className="py-2 pr-4">SNP</th>
             <th className="py-2">Typ</th>
             {hasAnnotations && <th className="py-2 pl-4">Adnotacja</th>}
@@ -194,6 +196,11 @@ export default function SegmentTable({
                   {hasCm && (
                     <td className="py-1.5 pr-4 font-mono">
                       {seg.length_cm !== null ? seg.length_cm.toFixed(2) : '—'}
+                    </td>
+                  )}
+                  {hasDensity && (
+                    <td className="py-1.5 pr-4 font-mono">
+                      {seg.density !== null ? seg.density.toFixed(1) : '—'}
                     </td>
                   )}
                   <td className="py-1.5 pr-4 font-mono">{seg.snp_count}</td>

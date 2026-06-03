@@ -34,6 +34,7 @@ export interface SegmentOut {
   end_cm: number | null
   length_bp: number
   length_cm: number | null
+  density: number | null
 }
 
 interface Props {
