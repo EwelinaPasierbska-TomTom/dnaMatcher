@@ -3,7 +3,7 @@ project: dnaMatcher
 version: 1
 status: draft
 created: 2026-05-25
-updated: 2026-06-03
+updated: 2026-06-07
 prd_version: 1
 main_goal: market-feedback
 top_blocker: time
@@ -36,7 +36,7 @@ Pasjonaci genealogii DNA posiadają pliki CSV z wynikami testów kilku członkó
 | S-03 | dna-comparison-engine       | wybrać 2+ profile, uruchomić porównanie i zobaczyć wyniki w tabeli i na diagramie chromosomów | S-02, F-02      | FR-005, FR-006, FR-007, US-01   | done     |
 | S-04 | phasing-ancestor-annotation | przypisać segment chromosomu do konkretnego przodka (fazowanie ręczne)                  | S-03                 | FR-008                          | done     |
 | S-05 | canvas-visualization        | widzieć chromosomy jako interaktywny diagram canvas z torami podobieństwa i fazowania   | S-04                 | FR-007                          | proposed |
-| S-06 | ancestor-management         | definiować nazwanych przodków z kolorami per porównanie i używać ich wielokrotnie        | S-04                 | FR-008                          | proposed |
+| S-06 | ancestor-management         | definiować nazwanych przodków z kolorami per porównanie i używać ich wielokrotnie        | S-04                 | FR-008                          | done     |
 | S-07 | phasing-click               | kliknąć tor chromosomu i przypisać segment do przodka bez formularza                    | S-05, S-06           | FR-008                          | proposed |
 | S-08 | segment-cm-density          | widzieć długość segmentu w cM i gęstość SNP/cM obok każdego segmentu                   | S-03                 | FR-006                          | done     |
 | S-09 | external-similarities       | rejestrować zewnętrzne dopasowania DNA z klastrami i widzieć je na diagramie            | S-05                 | —                               | proposed |
@@ -167,7 +167,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Wymaga migracji istniejących adnotacji `ancestor_label` (wolny tekst) na FK do nowej tabeli `ancestors`
-- **Status:** proposed
+- **Status:** done
 
 ### S-07: Fazowanie przez kliknięcie na diagramie
 
@@ -255,3 +255,4 @@ Brak otwartych pytań — PRD ma wynik 0 otwartych pytań (quality check: accept
 - **S-03: użytkownik może wybrać 2+ profile DNA, uruchomić porównanie i zobaczyć wyniki w tabeli i na diagramie chromosomów** — Archived 2026-06-03 → `context/archive/2026-05-30-dna-comparison/`. Lesson: —.
 - **F-02: (foundation) schemat Supabase wdrożony; tabele profili, wyników segmentów i adnotacji** — Archived 2026-06-03 → `context/archive/2026-05-25-database-schema/`. Lesson: —.
 - **S-08: użytkownik widzi długość segmentu w cM i gęstość SNP/cM obok każdego segmentu** — Archived 2026-06-03 → `context/archive/2026-06-03-segment-cm-density/`. Lesson: —.
+- **S-06: użytkownik definiuje nazwanych przodków z kolorami per porównanie i używa ich wielokrotnie przy fazowaniu** — Archived 2026-06-07 → `context/archive/2026-06-03-ancestor-management/`. Lesson: —.
