@@ -246,13 +246,13 @@ Brak nowych testów backendowych (faza 1 i 2 są czysto frontendowe). TypeScript
 
 #### Automated
 
-- [x] 2.1 `cd frontend && npx tsc --noEmit` exits 0
-- [x] 2.2 `uv run pytest` exits 0
+- [x] 2.1 `cd frontend && npx tsc --noEmit` exits 0 — bb14303
+- [x] 2.2 `uv run pytest` exits 0 — bb14303
 
 #### Manual
 
-- [x] 2.3 Tory fazowania widoczne pod torami podobieństwa
-- [x] 2.4 Segmenty kolorowane kolorem przodka (maternal góra / paternal dół)
-- [x] 2.5 Hover na torze fazowania — tooltip ze strand i osobą
-- [x] 2.6 Stare adnotacje bez ancestor_id — szary fallback, nie crashuje
-- [x] 2.7 Legenda pokazuje zarówno pary jak i osoby fazowane
+- [x] 2.3 Tory fazowania widoczne pod torami podobieństwa — bb14303
+- [x] 2.4 Segmenty kolorowane kolorem przodka (maternal góra / paternal dół) — bb14303
+- [x] 2.5 Hover na torze fazowania — tooltip ze strand i osobą — bb14303
+- [x] 2.6 Stare adnotacje bez ancestor_id — szary fallback, nie crashuje — bb14303
+- [x] 2.7 Legenda pokazuje zarówno pary jak i osoby fazowane — bb14303
