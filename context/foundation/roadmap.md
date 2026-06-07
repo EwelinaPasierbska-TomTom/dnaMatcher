@@ -5,6 +5,7 @@ status: draft
 created: 2026-05-25
 updated: 2026-06-07
 prd_version: 1
+
 main_goal: market-feedback
 top_blocker: time
 ---
@@ -37,7 +38,7 @@ Pasjonaci genealogii DNA posiadają pliki CSV z wynikami testów kilku członkó
 | S-04 | phasing-ancestor-annotation | przypisać segment chromosomu do konkretnego przodka (fazowanie ręczne)                  | S-03                 | FR-008                          | done     |
 | S-05 | canvas-visualization        | widzieć chromosomy jako interaktywny diagram canvas z torami podobieństwa i fazowania   | S-04                 | FR-007                          | done     |
 | S-06 | ancestor-management         | definiować nazwanych przodków z kolorami per porównanie i używać ich wielokrotnie        | S-04                 | FR-008                          | done     |
-| S-07 | phasing-click               | kliknąć tor chromosomu i przypisać segment do przodka bez formularza                    | S-05, S-06           | FR-008                          | proposed |
+| S-07 | phasing-click               | kliknąć tor chromosomu i przypisać segment do przodka bez formularza                    | S-05, S-06           | FR-008                          | done     |
 | S-08 | segment-cm-density          | widzieć długość segmentu w cM i gęstość SNP/cM obok każdego segmentu                   | S-03                 | FR-006                          | done     |
 | S-09 | external-similarities       | rejestrować zewnętrzne dopasowania DNA z klastrami i widzieć je na diagramie            | S-05                 | —                               | proposed |
 | S-10 | report-export               | eksportować raport HTML i zrzut JPG z wizualizacją chromosomów                          | S-05                 | FR-009                          | proposed |
@@ -179,7 +180,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Canvas hit-testing musi być zsynchronizowany z modelem danych przodków z S-06
-- **Status:** proposed
+- **Status:** done
 
 ### S-08: Szczegóły segmentów — cM i gęstość SNP
 
@@ -257,3 +258,4 @@ Brak otwartych pytań — PRD ma wynik 0 otwartych pytań (quality check: accept
 - **S-08: użytkownik widzi długość segmentu w cM i gęstość SNP/cM obok każdego segmentu** — Archived 2026-06-03 → `context/archive/2026-06-03-segment-cm-density/`. Lesson: —.
 - **S-06: użytkownik definiuje nazwanych przodków z kolorami per porównanie i używa ich wielokrotnie przy fazowaniu** — Archived 2026-06-07 → `context/archive/2026-06-03-ancestor-management/`. Lesson: —.
 - **S-05: użytkownik widzi chromosomy jako interaktywny diagram canvas z torami podobieństwa i fazowania per osoba** — Archived 2026-06-07 → `context/archive/2026-06-07-canvas-visualization/`. Lesson: —.
+- **S-07: użytkownik klika tor chromosomu i przypisuje segment do nazwanego przodka bez formularza** — Archived 2026-06-07 → `context/archive/2026-06-07-phasing-click/`. Lesson: —.
