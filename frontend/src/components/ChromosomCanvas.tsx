@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { AncestorOut } from './AncestorPanel'
+import AnnotationPopup from './AnnotationPopup'
+import type { PhasingPayload, PopupPayload, SimPayload } from './AnnotationPopup'
 import type { AnnotationOut, SegmentOut } from './ChromosomeDiagram'
-import type { ProfileMeta } from './SegmentTable'
+import type { ProfileMeta, UpsertAnnotationBody } from './SegmentTable'
 
 export interface PairResult {
   profile_ids: string[]
@@ -37,7 +39,8 @@ interface HitTarget {
   y: number
   w: number
   h: number
-  content: string
+  tooltipContent: string
+  payload: SimPayload | PhasingPayload
 }
 
 interface Props {
@@ -46,6 +49,8 @@ interface Props {
   annotations: AnnotationOut[]
   ancestors: AncestorOut[]
   chromosomeLengths?: Record<string, number>
+  onAnnotate?: (body: UpsertAnnotationBody) => Promise<void>
+  onDeleteAnnotation?: (id: string) => Promise<void>
 }
 
 export default function ChromosomCanvas({
@@ -54,11 +59,14 @@ export default function ChromosomCanvas({
   annotations,
   ancestors,
   chromosomeLengths,
+  onAnnotate,
+  onDeleteAnnotation,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const hitTargets = useRef<HitTarget[]>([])
   const [tooltip, setTooltip] = useState<{ x: number; y: number; content: string } | null>(null)
+  const [popup, setPopup] = useState<PopupPayload | null>(null)
   const [width, setWidth] = useState(0)
 
   const pairwisePairs = useMemo(
@@ -168,7 +176,8 @@ export default function ChromosomCanvas({
           const pairLabel = pair.person_names.join(' vs ')
           newHits.push({
             x, y: trackY, w, h: SIM_TRACK_HEIGHT,
-            content: `Chr${chrom}: ${seg.start_bp.toLocaleString()}–${seg.end_bp.toLocaleString()} bp | ${seg.match_type} | ${seg.snp_count} SNPs${cm} [${pairLabel}]`,
+            tooltipContent: `Chr${chrom}: ${seg.start_bp.toLocaleString()}–${seg.end_bp.toLocaleString()} bp | ${seg.match_type} | ${seg.snp_count} SNPs${cm} [${pairLabel}]`,
+            payload: { type: 'sim', pair, chromosome: chrom, start_bp: seg.start_bp, end_bp: seg.end_bp },
           })
         }
       }
@@ -209,7 +218,8 @@ export default function ChromosomCanvas({
             y: ann.strand === 'maternal' ? trackY : trackY + halfH,
             w,
             h: halfH,
-            content: `Chr${chrom}: ${ann.start_position.toLocaleString()}–${ann.end_position.toLocaleString()} bp | ${ann.strand} | ${person.name}${ancestorSuffix}`,
+            tooltipContent: `Chr${chrom}: ${ann.start_position.toLocaleString()}–${ann.end_position.toLocaleString()} bp | ${ann.strand} | ${person.name}${ancestorSuffix}`,
+            payload: { type: 'phasing', annotation: ann, person, strand: ann.strand },
           })
         }
       }
@@ -227,7 +237,22 @@ export default function ChromosomCanvas({
     const hit = hitTargets.current.find(
       t => mx >= t.x && mx <= t.x + t.w && my >= t.y && my <= t.y + t.h,
     )
-    setTooltip(hit ? { x: mx + 12, y: my - 8, content: hit.content } : null)
+    setTooltip(hit ? { x: mx + 12, y: my - 8, content: hit.tooltipContent } : null)
+    if (canvasRef.current) {
+      canvasRef.current.style.cursor = hit ? 'pointer' : 'crosshair'
+    }
+  }
+
+  function handleClick(e: React.MouseEvent<HTMLCanvasElement>) {
+    if (!onAnnotate) return
+    const rect = canvasRef.current?.getBoundingClientRect()
+    if (!rect) return
+    const mx = e.clientX - rect.left
+    const my = e.clientY - rect.top
+    const hit = hitTargets.current.find(
+      t => mx >= t.x && mx <= t.x + t.w && my >= t.y && my <= t.y + t.h,
+    )
+    setPopup(hit ? { ...hit.payload, px: mx, py: my } : null)
   }
 
   if (pairwisePairs.length === 0 || chromsWithData.length === 0) return null
@@ -276,17 +301,36 @@ export default function ChromosomCanvas({
           <canvas
             ref={canvasRef}
             onMouseMove={handleMouseMove}
-            onMouseLeave={() => setTooltip(null)}
-            className="block cursor-crosshair"
+            onMouseLeave={() => {
+              setTooltip(null)
+              if (canvasRef.current) canvasRef.current.style.cursor = 'crosshair'
+            }}
+            onClick={handleClick}
+            className="block"
+            style={{ cursor: 'crosshair' }}
           />
         )}
-        {tooltip && (
+        {!popup && tooltip && (
           <div
             className="pointer-events-none absolute z-10 max-w-xs rounded bg-gray-900 px-2 py-1 text-xs text-white shadow-lg"
             style={{ left: tooltip.x, top: tooltip.y }}
           >
             {tooltip.content}
           </div>
+        )}
+        {popup && onAnnotate && (
+          <AnnotationPopup
+            popup={popup}
+            allProfiles={allProfiles}
+            ancestors={ancestors}
+            onSave={async body => { await onAnnotate(body); setPopup(null) }}
+            onDelete={
+              onDeleteAnnotation
+                ? async id => { await onDeleteAnnotation(id); setPopup(null) }
+                : undefined
+            }
+            onClose={() => setPopup(null)}
+          />
         )}
       </div>
     </div>

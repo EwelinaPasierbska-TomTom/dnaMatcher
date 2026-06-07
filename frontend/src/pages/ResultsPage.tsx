@@ -249,6 +249,8 @@ export default function ResultsPage() {
                 allProfiles={data.profiles}
                 annotations={annotations}
                 ancestors={ancestors}
+                onAnnotate={handleUpsertAnnotation}
+                onDeleteAnnotation={handleDeleteAnnotation}
               />
             </div>
 
