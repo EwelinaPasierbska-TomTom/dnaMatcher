@@ -46,9 +46,22 @@ def read_genetic_map_tsv(path: str) -> dict[str, list[MapPoint]]:
     return chrom_to_points
 
 
-@functools.lru_cache(maxsize=22)
+@functools.lru_cache(maxsize=1)
 def readChromosomeMap(chromosomeNum: int) -> list[MapPoint] | None:
+    """Load and cache the genetic map for one chromosome at a time.
+
+    maxsize=1: segmentCreator processes chromosomes sequentially so only the
+    current chromosome needs to be in memory. Keeping all 22 (~500 MB) at once
+    exceeds Render's 512 MB limit.
+
+    Subsample every 10th point: reduces chr1 from 256 K to ~25 K MapPoints
+    (~5 MB instead of ~50 MB) with negligible effect on cM interpolation accuracy
+    at the segment level.
+    """
     if not (1 <= chromosomeNum <= 22):
         raise ValueError("chromosomeNum must be between 1 and 22")
     path = str(_MAP_DIR / f"genetic_map_GRCh37_chr{chromosomeNum}.txt")
-    return read_genetic_map_tsv(path).get(f"chr{chromosomeNum}")
+    points = read_genetic_map_tsv(path).get(f"chr{chromosomeNum}")
+    if points is None:
+        return None
+    return points[::10]
