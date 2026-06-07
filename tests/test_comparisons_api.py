@@ -18,8 +18,11 @@ PROFILE_ID_A = "aaaaaaaa-0000-0000-0000-000000000001"
 PROFILE_ID_B = "bbbbbbbb-0000-0000-0000-000000000002"
 COMPARISON_ID = "cccccccc-0000-0000-0000-000000000003"
 
-# Minimal valid MyHeritage CSV with enough SNPs to form a segment (min_snp_count=1)
-_VALID_CSV = "\n".join(f"rs{i};1;{i * 1000};AA;;;" for i in range(1, 15)).encode()
+# MyHeritage CSV: realistic chr1 positions (50 Mbp + i Mbp) so DNAPhaser's
+# cM-based filter passes (segment length >> 0.01 cM).
+_VALID_CSV = "\n".join(
+    f"rs{i};1;{50_000_000 + i * 1_000_000};AA;;;" for i in range(1, 15)
+).encode()
 
 _INVALID_CSV = "\n".join(f"rs{i};1;{i * 1000};--;;;" for i in range(1, 5)).encode()
 

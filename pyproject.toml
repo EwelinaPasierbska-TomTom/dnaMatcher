@@ -42,3 +42,8 @@ ignore_missing_imports = true
 # Mapping[str, JSON] responses cannot be indexed with string keys under strict typing.
 module = "src.routers.comparisons"
 ignore_errors = true
+
+[[tool.mypy.overrides]]
+# Transplanted from DNAPhaser without changes — original code predates strict typing.
+module = "src.dna.segment_matcher"
+ignore_errors = true

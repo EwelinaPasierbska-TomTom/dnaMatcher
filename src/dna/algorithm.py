@@ -1,130 +1,91 @@
-from itertools import groupby
+from __future__ import annotations
 
+from dataclasses import dataclass
+from typing import Any
+
+from src.dna import segment_matcher
+from src.dna.genome_tools import readChromosomeMap
 from src.dna.models import Segment, SNPRecord
+from src.dna.segment_matcher import interpolate_map_cm
 
-# Only standard DNA base characters are valid; anything else (N, -, 0, etc.)
-# marks a low-confidence call and the position is skipped entirely.
-_VALID_ALLELES: frozenset[str] = frozenset("ACGT")
+# Chromosome string ↔ DNAPhaser integer mapping (1-22 only; X/Y skipped by
+# segmentCreator which iterates range(1, 23)).
+_CHROM_TO_INT: dict[str, int] = {str(i): i for i in range(1, 23)}
+_INT_TO_CHROM: dict[int, str] = {v: k for k, v in _CHROM_TO_INT.items()}
 
-
-def _classify(snps: list[SNPRecord]) -> str:
-    """Classify co-located SNPs across N people.
-
-    Mirrors DNAPhaser's getSnpMachting logic:
-      FULL  — every person carries the identical (allele1, allele2) pair
-      HALF  — there exists one specific allele carried by every person
-               (i.e. each person has that allele at least once)
-      NONE  — no single allele is shared by all people
-      EMPTY — any person has a non-ACGT allele; caller skips the position
-    """
-    for snp in snps:
-        if snp.allele1 not in _VALID_ALLELES or snp.allele2 not in _VALID_ALLELES:
-            return "EMPTY"
-
-    # FULL: all people have the same sorted genotype tuple
-    g0 = (snps[0].allele1, snps[0].allele2)
-    if all(s.allele1 == g0[0] and s.allele2 == g0[1] for s in snps[1:]):
-        return "FULL"
-
-    # HALF: there is a single allele present in every person's genotype
-    for allele in _VALID_ALLELES:
-        if all(s.allele1 == allele or s.allele2 == allele for s in snps):
-            return "HALF"
-
-    return "NONE"
+_MATCH_TYPE: dict[str, str] = {"full": "FULL", "half": "HALF", "none": "NONE"}
 
 
-def _emit_segment(snps: list[SNPRecord], stype: str) -> Segment:
-    first, last = snps[0], snps[-1]
-    start_cm = first.position_cm
-    end_cm = last.position_cm
-    length_cm = (
-        abs(end_cm - start_cm) if start_cm is not None and end_cm is not None else None
-    )
-    snp_count = len(snps)
-    # None check must precede > 0: `None > 0` raises TypeError in Python.
-    density = snp_count / length_cm if length_cm and length_cm > 0 else None
-    return Segment(
-        chromosome=first.chromosome,
-        match_type=stype,
-        start_bp=first.position_bp,
-        end_bp=last.position_bp,
-        start_cm=start_cm,
-        end_cm=end_cm,
-        length_bp=last.position_bp - first.position_bp,
-        length_cm=length_cm,
-        snp_count=snp_count,
-        density=density,
-    )
+@dataclass
+class _SNP:
+    """Thin bridge: exposes the interface DNAPhaser's getSnpMachting expects."""
+
+    rsid: str
+    position: str
+    p1: str
+    p2: str
 
 
-def _build_segments(
-    classified: list[tuple[SNPRecord, str]],
-    max_gap_bp: int | None,
-    max_gap_cm: float | None,
-    min_snp_count: int,
-) -> list[Segment]:
-    """Convert (SNPRecord, match_type) pairs into a filtered Segment list.
+def _to_phaser_format(records: list[SNPRecord]) -> dict[int, dict[str, _SNP]]:
+    """Convert list[SNPRecord] → {chrom_int: {position_str: _SNP}}."""
+    result: dict[int, dict[str, _SNP]] = {i: {} for i in range(1, 24)}
+    for r in records:
+        chrom_int = _CHROM_TO_INT.get(r.chromosome)
+        if chrom_int is None:
+            continue
+        pos_str = str(r.position_bp)
+        result[chrom_int][pos_str] = _SNP(
+            rsid=pos_str,
+            position=pos_str,
+            p1=r.allele1,
+            p2=r.allele2,
+        )
+    return result
 
-    Asymmetric filtering (inspired by DNAPhaser's removeInsignificantNotNoneSegments):
-      - NONE segments: always kept (threshold = 1).  Dropping short NONE stretches
-        would merge flanking FULL/HALF regions across real non-matching loci, which
-        is the primary cause of spurious all-FULL output on real data.
-      - FULL / HALF segments: filtered by min_snp_count.
-      - EMPTY positions: silently skipped; they do not break the current segment.
-    """
-    segments: list[Segment] = []
-    if not classified:
-        return segments
 
-    def chrom_key(item: tuple[SNPRecord, str]) -> str:
-        return item[0].chromosome
+def _phaser_to_segments(raw: Any) -> list[Segment]:
+    """Convert DNAPhaser segment dict → list[Segment] with cM positions from map."""
+    out: list[Segment] = []
+    for chrom_int, segs in raw.items():
+        if not segs:
+            continue
+        chrom_str = _INT_TO_CHROM.get(chrom_int)
+        if chrom_str is None:
+            continue
 
-    for _chrom, chrom_iter in groupby(classified, key=chrom_key):
-        seg_snps: list[SNPRecord] = []
-        seg_type: str = ""
+        chrom_map = readChromosomeMap(chrom_int)
+        bps = [p.bp for p in chrom_map] if chrom_map else []
 
-        for snp, mtype in chrom_iter:
-            if mtype == "EMPTY":
-                # Low-confidence call: skip without breaking the current segment
-                continue
+        for seg in segs:
+            match_type = _MATCH_TYPE.get(seg.type)
+            if not match_type:
+                continue  # skip "gap" and "empty"
 
-            if not seg_snps:
-                seg_snps = [snp]
-                seg_type = mtype
-                continue
+            start_bp = int(seg.startingPoint)
+            end_bp = int(seg.endPoint)
 
-            prev = seg_snps[-1]
-            gap_bp_exceeded = (
-                max_gap_bp is not None
-                and (snp.position_bp - prev.position_bp) > max_gap_bp
-            )
-            gap_cm_exceeded = (
-                max_gap_cm is not None
-                and snp.position_cm is not None
-                and prev.position_cm is not None
-                and (snp.position_cm - prev.position_cm) > max_gap_cm
-            )
-
-            if mtype != seg_type or gap_bp_exceeded or gap_cm_exceeded:
-                threshold = 1 if seg_type == "NONE" else min_snp_count
-                if len(seg_snps) >= threshold:
-                    segments.append(_emit_segment(seg_snps, seg_type))
-                seg_snps = [snp]
-                seg_type = mtype
+            if chrom_map:
+                start_cm = interpolate_map_cm(chrom_map, start_bp, bps)  # type: ignore[no-untyped-call]
+                end_cm = interpolate_map_cm(chrom_map, end_bp, bps)  # type: ignore[no-untyped-call]
             else:
-                seg_snps.append(snp)
+                start_cm = None
+                end_cm = None
 
-        if seg_snps:
-            threshold = 1 if seg_type == "NONE" else min_snp_count
-            if len(seg_snps) >= threshold:
-                segments.append(_emit_segment(seg_snps, seg_type))
-
-    return segments
-
-
-def _index_by_position(records: list[SNPRecord]) -> dict[tuple[str, int], SNPRecord]:
-    return {(r.chromosome, r.position_bp): r for r in records}
+            out.append(
+                Segment(
+                    chromosome=chrom_str,
+                    match_type=match_type,
+                    start_bp=start_bp,
+                    end_bp=end_bp,
+                    start_cm=start_cm,
+                    end_cm=end_cm,
+                    length_bp=end_bp - start_bp,
+                    length_cm=seg.length,
+                    snp_count=seg.count,
+                    density=seg.density,
+                )
+            )
+    return out
 
 
 def compare_pairwise(
@@ -134,18 +95,11 @@ def compare_pairwise(
     max_gap_bp: int | None = None,
     max_gap_cm: float | None = None,
 ) -> list[Segment]:
-    """Compare two SNP profiles and return classified segments."""
-    idx_b = _index_by_position(b)
-    classified: list[tuple[SNPRecord, str]] = []
-
-    for snp_a in a:
-        key = (snp_a.chromosome, snp_a.position_bp)
-        snp_b = idx_b.get(key)
-        if snp_b is None:
-            continue
-        classified.append((snp_a, _classify([snp_a, snp_b])))
-
-    return _build_segments(classified, max_gap_bp, max_gap_cm, min_snp_count)
+    """Compare two SNP profiles using the DNAPhaser algorithm."""
+    persons = [_to_phaser_format(a), _to_phaser_format(b)]
+    bar_code = segment_matcher.findMatchingBarCode(persons)  # type: ignore[no-untyped-call]
+    raw = segment_matcher.segmentCreator(bar_code)  # type: ignore[no-untyped-call]
+    return _phaser_to_segments(raw)
 
 
 def compare_three_way(
@@ -156,17 +110,8 @@ def compare_three_way(
     max_gap_bp: int | None = None,
     max_gap_cm: float | None = None,
 ) -> list[Segment]:
-    """Compare three SNP profiles and return classified segments."""
-    idx_b = _index_by_position(b)
-    idx_c = _index_by_position(c)
-    classified: list[tuple[SNPRecord, str]] = []
-
-    for snp_a in a:
-        key = (snp_a.chromosome, snp_a.position_bp)
-        snp_b = idx_b.get(key)
-        snp_c = idx_c.get(key)
-        if snp_b is None or snp_c is None:
-            continue
-        classified.append((snp_a, _classify([snp_a, snp_b, snp_c])))
-
-    return _build_segments(classified, max_gap_bp, max_gap_cm, min_snp_count)
+    """Compare three SNP profiles using the DNAPhaser algorithm."""
+    persons = [_to_phaser_format(a), _to_phaser_format(b), _to_phaser_format(c)]
+    bar_code = segment_matcher.findMatchingBarCode(persons)  # type: ignore[no-untyped-call]
+    raw = segment_matcher.segmentCreator(bar_code)  # type: ignore[no-untyped-call]
+    return _phaser_to_segments(raw)
