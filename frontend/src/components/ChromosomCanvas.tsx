@@ -252,7 +252,12 @@ export default function ChromosomCanvas({
     const hit = hitTargets.current.find(
       t => mx >= t.x && mx <= t.x + t.w && my >= t.y && my <= t.y + t.h,
     )
-    setPopup(hit ? { ...hit.payload, px: mx, py: my } : null)
+    if (!hit) { setPopup(null); return }
+    const cw = containerRef.current?.clientWidth ?? width
+    const ch = containerRef.current?.clientHeight ?? totalHeight
+    const px = mx + 200 > cw ? mx - 216 : mx
+    const py = my + 120 > ch ? my - 120 : my
+    setPopup({ ...hit.payload, px, py })
   }
 
   if (pairwisePairs.length === 0 || chromsWithData.length === 0) return null
@@ -321,9 +326,8 @@ export default function ChromosomCanvas({
         {popup && onAnnotate && (
           <AnnotationPopup
             popup={popup}
-            allProfiles={allProfiles}
             ancestors={ancestors}
-            onSave={async body => { await onAnnotate(body); setPopup(null) }}
+            onSave={onAnnotate}
             onDelete={
               onDeleteAnnotation
                 ? async id => { await onDeleteAnnotation(id); setPopup(null) }

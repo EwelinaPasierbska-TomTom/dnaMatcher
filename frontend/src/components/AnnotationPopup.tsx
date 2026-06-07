@@ -31,7 +31,6 @@ export type PopupPayload = (SimPayload | PhasingPayload) & { px: number; py: num
 
 interface Props {
   popup: PopupPayload
-  allProfiles: ProfileMeta[]
   ancestors: AncestorOut[]
   onSave: (body: UpsertAnnotationBody) => Promise<void>
   onDelete?: (id: string) => Promise<void>
@@ -40,7 +39,6 @@ interface Props {
 
 export default function AnnotationPopup({
   popup,
-  allProfiles: _allProfiles,
   ancestors,
   onSave,
   onDelete,
@@ -64,7 +62,10 @@ export default function AnnotationPopup({
   async function handleSave() {
     if (!ancestorId) return
     const ancestor = ancestors.find(a => a.id === ancestorId)
-    if (!ancestor) return
+    if (!ancestor) {
+      setError('Wybrany przodek nie istnieje. Wybierz innego.')
+      return
+    }
 
     setSaving(true)
     setError(null)
@@ -102,6 +103,7 @@ export default function AnnotationPopup({
     if (!onDelete || !phasing) return
     if (!window.confirm('Usunąć adnotację?')) return
     setSaving(true)
+    setError(null)
     try {
       await onDelete(phasing.annotation.id)
       onClose()
@@ -200,8 +202,6 @@ export default function AnnotationPopup({
         )}
       </div>
 
-      {error && <p className="mb-2 text-xs text-red-600">{error}</p>}
-
       {/* Actions */}
       <div className="flex gap-2">
         <button
@@ -228,6 +228,7 @@ export default function AnnotationPopup({
           Anuluj
         </button>
       </div>
+      {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
     </div>
   )
 }

@@ -1,7 +1,7 @@
 ---
 change_id: phasing-click
 title: Fazowanie przez kliknięcie na diagramie canvas
-status: implemented
+status: impl_reviewed
 created: 2026-06-07
 updated: 2026-06-07
 archived_at: null
