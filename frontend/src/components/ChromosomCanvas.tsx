@@ -216,7 +216,8 @@ export default function ChromosomCanvas({
     }
 
     hitTargets.current = newHits
-  }, [width, pairwisePairs, chromsWithData, nPairs, nPhasingPersons, phasingPersons, annotations, ancestorColorMap, chromGroupHeight, totalHeight, chromosomeLengths])
+    setTooltip(null)
+  }, [width, pairwisePairs, chromsWithData, phasingPersons, annotations, ancestorColorMap, chromosomeLengths])
 
   function handleMouseMove(e: React.MouseEvent<HTMLCanvasElement>) {
     const rect = canvasRef.current?.getBoundingClientRect()
