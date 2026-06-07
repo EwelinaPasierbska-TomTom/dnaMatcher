@@ -1,16 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import AncestorPanel, { type AncestorOut } from '../components/AncestorPanel'
+import ChromosomCanvas, { type PairResult } from '../components/ChromosomCanvas'
 import type { AnnotationOut } from '../components/ChromosomeDiagram'
-import ChromosomeDiagram, { type SegmentOut } from '../components/ChromosomeDiagram'
 import SegmentTable, { type ProfileMeta, type UpsertAnnotationBody } from '../components/SegmentTable'
 import { apiFetch } from '../lib/api'
-
-interface PairResult {
-  profile_ids: string[]
-  person_names: string[]
-  segments: SegmentOut[]
-}
 
 interface ComparisonData {
   id: string
@@ -59,31 +53,19 @@ function PairSection({
         <span className="text-gray-400 text-sm">{open ? '▲' : '▼'}</span>
       </button>
       {open && (
-        <div className="p-5 space-y-6">
-          <div>
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
-              Diagram chromosomów
-            </h3>
-            <ChromosomeDiagram
-              segments={pair.segments}
-              annotations={annotations}
-              ancestors={ancestors}
-            />
-          </div>
-          <div>
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
-              Segmenty ({pair.segments.length})
-            </h3>
-            <SegmentTable
-              segments={pair.segments}
-              profiles={pairProfiles}
-              annotations={annotations}
-              ancestors={ancestors}
-              onAnnotate={onAnnotate}
-              onDeleteAnnotation={onDeleteAnnotation}
-              onCreateAncestor={onCreateAncestor}
-            />
-          </div>
+        <div className="p-5">
+          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
+            Segmenty ({pair.segments.length})
+          </h3>
+          <SegmentTable
+            segments={pair.segments}
+            profiles={pairProfiles}
+            annotations={annotations}
+            ancestors={ancestors}
+            onAnnotate={onAnnotate}
+            onDeleteAnnotation={onDeleteAnnotation}
+            onCreateAncestor={onCreateAncestor}
+          />
         </div>
       )}
     </div>
@@ -256,6 +238,18 @@ export default function ResultsPage() {
                   {deleting ? 'Usuwanie…' : 'Usuń porównanie'}
                 </button>
               </div>
+            </div>
+
+            <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
+                Diagram chromosomów
+              </h3>
+              <ChromosomCanvas
+                pairs={data.pairs}
+                allProfiles={data.profiles}
+                annotations={annotations}
+                ancestors={ancestors}
+              />
             </div>
 
             <div className="space-y-3">
