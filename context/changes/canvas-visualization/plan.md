@@ -227,32 +227,32 @@ Brak nowych testów backendowych (faza 1 i 2 są czysto frontendowe). TypeScript
 
 #### Automated
 
-- [x] 1.1 `cd frontend && npx tsc --noEmit` exits 0
-- [x] 1.2 `uv run pytest` exits 0
-- [x] 1.3 `uv run ruff check .` exits 0
+- [x] 1.1 `cd frontend && npx tsc --noEmit` exits 0 — c14aa17
+- [x] 1.2 `uv run pytest` exits 0 — c14aa17
+- [x] 1.3 `uv run ruff check .` exits 0 — c14aa17
 
 #### Manual
 
-- [ ] 1.4 Canvas widoczny na stronie wyników nad sekcjami par
-- [ ] 1.5 Dla 2 osób: 1 tor per chromosom z kolorowymi segmentami FULL/HALF/NONE
-- [ ] 1.6 Dla 3 osób: 3 tory per chromosom (A-B, A-C, B-C)
-- [ ] 1.7 Hover nad segmentem pokazuje tooltip z danymi
-- [ ] 1.8 Diagram responsywny (resize okna przerysowuje canvas)
-- [ ] 1.9 Diagram ostry na Retina
-- [ ] 1.10 Legenda HTML pokazuje etykiety par
-- [ ] 1.11 PairSection nie zawiera już diagramu (tylko tabela)
+- [x] 1.4 Canvas widoczny na stronie wyników nad sekcjami par — c14aa17
+- [x] 1.5 Dla 2 osób: 1 tor per chromosom z kolorowymi segmentami FULL/HALF/NONE — c14aa17
+- [x] 1.6 Dla 3 osób: 3 tory per chromosom (A-B, A-C, B-C) — c14aa17
+- [x] 1.7 Hover nad segmentem pokazuje tooltip z danymi — c14aa17
+- [x] 1.8 Diagram responsywny (resize okna przerysowuje canvas) — c14aa17
+- [x] 1.9 Diagram ostry na Retina — c14aa17
+- [x] 1.10 Legenda HTML pokazuje etykiety par — c14aa17
+- [x] 1.11 PairSection nie zawiera już diagramu (tylko tabela) — c14aa17
 
 ### Phase 2: Tory fazowania (maternal/paternal per osoba)
 
 #### Automated
 
-- [ ] 2.1 `cd frontend && npx tsc --noEmit` exits 0
-- [ ] 2.2 `uv run pytest` exits 0
+- [x] 2.1 `cd frontend && npx tsc --noEmit` exits 0
+- [x] 2.2 `uv run pytest` exits 0
 
 #### Manual
 
-- [ ] 2.3 Tory fazowania widoczne pod torami podobieństwa
-- [ ] 2.4 Segmenty kolorowane kolorem przodka (maternal góra / paternal dół)
-- [ ] 2.5 Hover na torze fazowania — tooltip ze strand i osobą
-- [ ] 2.6 Stare adnotacje bez ancestor_id — szary fallback, nie crashuje
-- [ ] 2.7 Legenda pokazuje zarówno pary jak i osoby fazowane
+- [x] 2.3 Tory fazowania widoczne pod torami podobieństwa
+- [x] 2.4 Segmenty kolorowane kolorem przodka (maternal góra / paternal dół)
+- [x] 2.5 Hover na torze fazowania — tooltip ze strand i osobą
+- [x] 2.6 Stare adnotacje bez ancestor_id — szary fallback, nie crashuje
+- [x] 2.7 Legenda pokazuje zarówno pary jak i osoby fazowane

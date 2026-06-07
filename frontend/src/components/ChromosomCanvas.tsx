@@ -27,6 +27,7 @@ const COLORS: Record<string, string> = {
 
 const LABEL_WIDTH = 36
 const SIM_TRACK_HEIGHT = 10
+const PHASING_TRACK_HEIGHT = 16
 const TRACK_GAP = 2
 const CHROM_GAP = 8
 const PAD = 8
@@ -41,17 +42,17 @@ interface HitTarget {
 
 interface Props {
   pairs: PairResult[]
-  allProfiles: ProfileMeta[]   // used in phase 2 (phasing track labels)
-  annotations: AnnotationOut[] // used in phase 2
-  ancestors: AncestorOut[]     // used in phase 2
+  allProfiles: ProfileMeta[]
+  annotations: AnnotationOut[]
+  ancestors: AncestorOut[]
   chromosomeLengths?: Record<string, number>
 }
 
 export default function ChromosomCanvas({
   pairs,
-  allProfiles: _allProfiles,
-  annotations: _annotations,
-  ancestors: _ancestors,
+  allProfiles,
+  annotations,
+  ancestors,
   chromosomeLengths,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -77,8 +78,21 @@ export default function ChromosomCanvas({
     })
   }, [pairwisePairs])
 
+  const phasingPersons = useMemo(() => {
+    const ids = new Set(pairwisePairs.flatMap(p => p.profile_ids))
+    return allProfiles.filter(p => ids.has(p.id))
+  }, [pairwisePairs, allProfiles])
+
+  const ancestorColorMap = useMemo(
+    () => Object.fromEntries(ancestors.map(a => [a.id, a.color])),
+    [ancestors],
+  )
+
   const nPairs = pairwisePairs.length
-  const chromGroupHeight = nPairs * (SIM_TRACK_HEIGHT + TRACK_GAP)
+  const nPhasingPersons = phasingPersons.length
+  const chromGroupHeight =
+    nPairs * (SIM_TRACK_HEIGHT + TRACK_GAP) +
+    nPhasingPersons * (PHASING_TRACK_HEIGHT + TRACK_GAP)
   const totalHeight =
     chromsWithData.length === 0
       ? 0
@@ -158,10 +172,51 @@ export default function ChromosomCanvas({
           })
         }
       }
+
+      // Phasing tracks: one per unique person, maternal top / paternal bottom
+      const simHeight = nPairs * (SIM_TRACK_HEIGHT + TRACK_GAP)
+      for (let pp = 0; pp < phasingPersons.length; pp++) {
+        const person = phasingPersons[pp]
+        const trackY = chromY + simHeight + pp * (PHASING_TRACK_HEIGHT + TRACK_GAP)
+        const halfH = PHASING_TRACK_HEIGHT / 2
+
+        // Gray background
+        ctx.fillStyle = '#e5e7eb'
+        ctx.fillRect(LABEL_WIDTH, trackY, trackWidth, PHASING_TRACK_HEIGHT)
+
+        const personAnns = annotations.filter(
+          a => a.profile_id === person.id && a.chromosome === chrom,
+        )
+
+        for (const ann of personAnns) {
+          const x = LABEL_WIDTH + (ann.start_position / chromLen) * trackWidth
+          const w = Math.max(1, ((ann.end_position - ann.start_position) / chromLen) * trackWidth)
+          const color =
+            ann.ancestor_id && ancestorColorMap[ann.ancestor_id]
+              ? ancestorColorMap[ann.ancestor_id]
+              : '#9ca3af'
+
+          ctx.fillStyle = color
+          if (ann.strand === 'maternal') {
+            ctx.fillRect(x, trackY, w, halfH)
+          } else {
+            ctx.fillRect(x, trackY + halfH, w, halfH)
+          }
+
+          const ancestorSuffix = ann.ancestor_label ? ` → ${ann.ancestor_label}` : ''
+          newHits.push({
+            x,
+            y: ann.strand === 'maternal' ? trackY : trackY + halfH,
+            w,
+            h: halfH,
+            content: `Chr${chrom}: ${ann.start_position.toLocaleString()}–${ann.end_position.toLocaleString()} bp | ${ann.strand} | ${person.name}${ancestorSuffix}`,
+          })
+        }
+      }
     }
 
     hitTargets.current = newHits
-  }, [width, pairwisePairs, chromsWithData, nPairs, chromGroupHeight, totalHeight, chromosomeLengths])
+  }, [width, pairwisePairs, chromsWithData, nPairs, nPhasingPersons, phasingPersons, annotations, ancestorColorMap, chromGroupHeight, totalHeight, chromosomeLengths])
 
   function handleMouseMove(e: React.MouseEvent<HTMLCanvasElement>) {
     const rect = canvasRef.current?.getBoundingClientRect()
@@ -200,6 +255,18 @@ export default function ChromosomCanvas({
           <span className="inline-block h-2.5 w-4 rounded-sm" style={{ backgroundColor: COLORS.NONE }} />
           NONE
         </span>
+        {phasingPersons.length > 0 && (
+          <>
+            <span className="ml-2 font-medium text-gray-600">Fazowanie:</span>
+            {phasingPersons.map(p => (
+              <span key={p.id} className="flex items-center gap-1">
+                <span className="inline-block h-2.5 w-4 rounded-sm bg-gray-300" />
+                {p.name}
+              </span>
+            ))}
+            <span className="text-gray-400 italic">(mat/pat)</span>
+          </>
+        )}
       </div>
 
       {/* Canvas */}
