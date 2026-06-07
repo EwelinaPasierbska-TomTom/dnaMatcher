@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import type { AnnotationOut, SegmentOut } from './ChromosomeDiagram'
+import { ANCESTOR_COLORS } from './AncestorPanel'
 import type { AncestorOut } from './AncestorPanel'
 
 export interface ProfileMeta {
@@ -217,9 +218,8 @@ export default function SegmentTable({
                 : undefined
 
             return (
-              <>
+              <Fragment key={`${seg.chromosome}-${seg.start_bp}-${seg.end_bp}`}>
                 <tr
-                  key={i}
                   onClick={() => hasAnnotations && openRow(i, seg)}
                   className={`border-b border-gray-100 ${hasAnnotations ? 'cursor-pointer hover:bg-indigo-50' : 'hover:bg-gray-50'} ${isExpanded ? 'bg-indigo-50' : ''}`}
                 >
@@ -321,14 +321,30 @@ export default function SegmentTable({
                             )}
                           </select>
                           {formAncestorId === 'new' && (
-                            <input
-                              type="text"
-                              value={newAncestorName}
-                              onChange={(e) => setNewAncestorName(e.target.value)}
-                              placeholder="Imię przodka"
-                              className="mt-1 text-sm border border-gray-300 rounded px-2 py-1"
-                              disabled={formSaving}
-                            />
+                            <div className="mt-1 space-y-1">
+                              <input
+                                type="text"
+                                value={newAncestorName}
+                                onChange={(e) => setNewAncestorName(e.target.value)}
+                                placeholder="Imię przodka"
+                                className="text-sm border border-gray-300 rounded px-2 py-1 w-full"
+                                disabled={formSaving}
+                              />
+                              <div className="flex flex-wrap gap-1">
+                                {ANCESTOR_COLORS.map((c) => (
+                                  <button
+                                    key={c}
+                                    type="button"
+                                    onClick={() => setNewAncestorColor(c)}
+                                    className="w-5 h-5 rounded-full border-2 transition-transform hover:scale-110"
+                                    style={{
+                                      backgroundColor: c,
+                                      borderColor: newAncestorColor === c ? '#1f2937' : 'transparent',
+                                    }}
+                                  />
+                                ))}
+                              </div>
+                            </div>
                           )}
                         </div>
                         <button
@@ -361,7 +377,7 @@ export default function SegmentTable({
                     </td>
                   </tr>
                 )}
-              </>
+              </Fragment>
             )
           })}
         </tbody>

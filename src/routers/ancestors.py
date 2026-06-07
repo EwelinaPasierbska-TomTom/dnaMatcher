@@ -82,10 +82,12 @@ def create_ancestor(
             )
             .execute()
         )
-    except Exception:
-        raise HTTPException(
-            status_code=409, detail="Przodek o tej nazwie już istnieje."
-        )
+    except Exception as exc:
+        if "unique" in str(exc).lower():
+            raise HTTPException(
+                status_code=409, detail="Przodek o tej nazwie już istnieje."
+            )
+        raise HTTPException(status_code=500, detail="Błąd zapisu przodka.")
     if not result.data:
         raise HTTPException(status_code=500, detail="Błąd zapisu przodka.")
     return _row_to_out(result.data[0])
@@ -99,13 +101,20 @@ def update_ancestor(
     client: Client = Depends(get_supabase_client),
 ) -> AncestorOut:
     db = client.postgrest.auth(current_user.access_token)
-    result = (
-        db.from_("ancestors")
-        .update({"name": body.name, "color": body.color})
-        .eq("id", str(ancestor_id))
-        .eq("user_id", str(current_user.id))
-        .execute()
-    )
+    try:
+        result = (
+            db.from_("ancestors")
+            .update({"name": body.name, "color": body.color})
+            .eq("id", str(ancestor_id))
+            .eq("user_id", str(current_user.id))
+            .execute()
+        )
+    except Exception as exc:
+        if "unique" in str(exc).lower():
+            raise HTTPException(
+                status_code=409, detail="Przodek o tej nazwie już istnieje."
+            )
+        raise HTTPException(status_code=500, detail="Błąd aktualizacji przodka.")
     if not result.data:
         raise HTTPException(status_code=404, detail="Przodek nie znaleziony.")
     return _row_to_out(result.data[0])

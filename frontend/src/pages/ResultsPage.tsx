@@ -119,12 +119,12 @@ export default function ResultsPage() {
         }
         setData((await compRes.json()) as ComparisonData)
 
-        if (annRes.ok) {
-          setAnnotations((await annRes.json()) as AnnotationOut[])
+        if (!annRes.ok || !ancRes.ok) {
+          setError('Nie udało się załadować danych. Odśwież stronę.')
+          return
         }
-        if (ancRes.ok) {
-          setAncestors((await ancRes.json()) as AncestorOut[])
-        }
+        setAnnotations((await annRes.json()) as AnnotationOut[])
+        setAncestors((await ancRes.json()) as AncestorOut[])
       } catch {
         setError('Nie udało się połączyć z serwerem.')
       } finally {

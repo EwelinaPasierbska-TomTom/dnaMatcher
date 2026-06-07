@@ -33,15 +33,19 @@ export default function AncestorPanel({ ancestors, onAdd, onUpdate, onDelete }: 
   const [editName, setEditName] = useState('')
   const [editColor, setEditColor] = useState('')
   const [saving, setSaving] = useState(false)
+  const [formError, setFormError] = useState<string | null>(null)
 
   async function handleAdd() {
     if (!addName.trim()) return
     setSaving(true)
+    setFormError(null)
     try {
       await onAdd(addName.trim(), addColor)
       setAddName('')
       setAddColor(ANCESTOR_COLORS[0])
       setAdding(false)
+    } catch {
+      setFormError('Nie udało się dodać przodka. Sprawdź czy nazwa jest unikalna.')
     } finally {
       setSaving(false)
     }
@@ -56,9 +60,12 @@ export default function AncestorPanel({ ancestors, onAdd, onUpdate, onDelete }: 
   async function handleUpdate() {
     if (!editId || !editName.trim()) return
     setSaving(true)
+    setFormError(null)
     try {
       await onUpdate(editId, editName.trim(), editColor)
       setEditId(null)
+    } catch {
+      setFormError('Nie udało się zaktualizować przodka. Sprawdź czy nazwa jest unikalna.')
     } finally {
       setSaving(false)
     }
@@ -106,13 +113,16 @@ export default function AncestorPanel({ ancestors, onAdd, onUpdate, onDelete }: 
                   Zapisz
                 </button>
                 <button
-                  onClick={() => setEditId(null)}
+                  onClick={() => { setEditId(null); setFormError(null) }}
                   disabled={saving}
                   className="text-xs text-gray-400 hover:text-gray-600 px-2 py-1"
                 >
                   Anuluj
                 </button>
               </div>
+              {formError && (
+                <p className="text-xs text-red-600">{formError}</p>
+              )}
             </li>
           ) : (
             <li key={a.id} className="flex items-center gap-2 group">
@@ -129,7 +139,7 @@ export default function AncestorPanel({ ancestors, onAdd, onUpdate, onDelete }: 
                 ✎
               </button>
               <button
-                onClick={() => void onDelete(a.id)}
+                onClick={() => { if (window.confirm(`Usunąć przodka "${a.name}"? Wszystkie powiązane adnotacje zostaną usunięte.`)) void onDelete(a.id) }}
                 className="text-xs text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity px-1"
                 title="Usuń"
               >
@@ -172,13 +182,16 @@ export default function AncestorPanel({ ancestors, onAdd, onUpdate, onDelete }: 
               Dodaj
             </button>
             <button
-              onClick={() => { setAdding(false); setAddName('') }}
+              onClick={() => { setAdding(false); setAddName(''); setFormError(null) }}
               disabled={saving}
               className="text-xs text-gray-400 hover:text-gray-600 px-2 py-1"
             >
               Anuluj
             </button>
           </div>
+          {formError && (
+            <p className="text-xs text-red-600">{formError}</p>
+          )}
         </div>
       ) : (
         <button
