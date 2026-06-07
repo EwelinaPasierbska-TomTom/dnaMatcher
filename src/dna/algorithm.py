@@ -26,21 +26,30 @@ class _SNP:
     p2: str
 
 
-def _to_phaser_format(records: list[SNPRecord]) -> dict[int, dict[str, _SNP]]:
-    """Convert list[SNPRecord] → {chrom_int: {position_str: _SNP}}."""
-    result: dict[int, dict[str, _SNP]] = {i: {} for i in range(1, 24)}
+def _group_by_chrom(records: list[SNPRecord]) -> dict[str, list[SNPRecord]]:
+    """Group SNPRecords by chromosome string (references only, no copying)."""
+    groups: dict[str, list[SNPRecord]] = {}
     for r in records:
-        chrom_int = _CHROM_TO_INT.get(r.chromosome)
-        if chrom_int is None:
-            continue
+        groups.setdefault(r.chromosome, []).append(r)
+    return groups
+
+
+def _phaser_dict_for_chrom(
+    records: list[SNPRecord], chrom_int: int
+) -> dict[int, dict[str, _SNP]]:
+    """Build a single-chromosome phaser dict for one profile.
+
+    Returns the full {1..23: {}} structure that findMatchingBarCode expects,
+    but only chrom_int is populated so segmentCreator skips the other 21.
+    """
+    phaser: dict[int, dict[str, _SNP]] = {i: {} for i in range(1, 24)}
+    chrom_dict = phaser[chrom_int]
+    for r in records:
         pos_str = str(r.position_bp)
-        result[chrom_int][pos_str] = _SNP(
-            rsid=pos_str,
-            position=pos_str,
-            p1=r.allele1,
-            p2=r.allele2,
+        chrom_dict[pos_str] = _SNP(
+            rsid=pos_str, position=pos_str, p1=r.allele1, p2=r.allele2
         )
-    return result
+    return phaser
 
 
 def _phaser_to_segments(raw: Any) -> list[Segment]:
@@ -88,6 +97,44 @@ def _phaser_to_segments(raw: Any) -> list[Segment]:
     return out
 
 
+def _run_chrom_by_chrom(
+    profiles_by_chrom: list[dict[str, list[SNPRecord]]],
+) -> list[Segment]:
+    """Run DNAPhaser one chromosome at a time to stay within memory limits.
+
+    Converting all ~700 K SNPs per profile to phaser format at once doubles
+    the in-memory data (~200 MB × 2 profiles = ~400 MB before any processing).
+    Processing one chromosome at a time keeps the peak phaser allocation
+    to ~5-10 MB regardless of input size.
+    """
+    all_segments: list[Segment] = []
+
+    for chrom_int in range(1, 23):
+        chrom_str = _INT_TO_CHROM[chrom_int]
+
+        # Extract this chromosome's SNPs for each profile
+        chrom_records = [
+            chrom_data.get(chrom_str, []) for chrom_data in profiles_by_chrom
+        ]
+
+        # Skip if any profile has no SNPs on this chromosome
+        if any(len(recs) == 0 for recs in chrom_records):
+            continue
+
+        # Build minimal single-chromosome phaser dicts
+        persons = [_phaser_dict_for_chrom(recs, chrom_int) for recs in chrom_records]
+
+        # DNAPhaser: find common SNPs → classify → build segments
+        bar_code = segment_matcher.findMatchingBarCode(persons)  # type: ignore[no-untyped-call]
+        raw = segment_matcher.segmentCreator(bar_code)  # type: ignore[no-untyped-call]
+        all_segments.extend(_phaser_to_segments(raw))
+
+        # Release per-chromosome objects before the next iteration
+        del persons, bar_code, raw, chrom_records
+
+    return all_segments
+
+
 def compare_pairwise(
     a: list[SNPRecord],
     b: list[SNPRecord],
@@ -96,10 +143,7 @@ def compare_pairwise(
     max_gap_cm: float | None = None,
 ) -> list[Segment]:
     """Compare two SNP profiles using the DNAPhaser algorithm."""
-    persons = [_to_phaser_format(a), _to_phaser_format(b)]
-    bar_code = segment_matcher.findMatchingBarCode(persons)  # type: ignore[no-untyped-call]
-    raw = segment_matcher.segmentCreator(bar_code)  # type: ignore[no-untyped-call]
-    return _phaser_to_segments(raw)
+    return _run_chrom_by_chrom([_group_by_chrom(a), _group_by_chrom(b)])
 
 
 def compare_three_way(
@@ -111,7 +155,6 @@ def compare_three_way(
     max_gap_cm: float | None = None,
 ) -> list[Segment]:
     """Compare three SNP profiles using the DNAPhaser algorithm."""
-    persons = [_to_phaser_format(a), _to_phaser_format(b), _to_phaser_format(c)]
-    bar_code = segment_matcher.findMatchingBarCode(persons)  # type: ignore[no-untyped-call]
-    raw = segment_matcher.segmentCreator(bar_code)  # type: ignore[no-untyped-call]
-    return _phaser_to_segments(raw)
+    return _run_chrom_by_chrom(
+        [_group_by_chrom(a), _group_by_chrom(b), _group_by_chrom(c)]
+    )
