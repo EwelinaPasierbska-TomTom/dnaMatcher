@@ -269,15 +269,15 @@ Brak nowych testów backendowych. TypeScript (`tsc --noEmit`) weryfikuje typy ko
 
 #### Automated
 
-- [x] 1.1 `cd frontend && npx tsc --noEmit` exits 0
-- [x] 1.2 `uv run pytest` exits 0
+- [x] 1.1 `cd frontend && npx tsc --noEmit` exits 0 — 4d59f99
+- [x] 1.2 `uv run pytest` exits 0 — 4d59f99
 
 #### Manual
 
-- [x] 1.3 Kursor pointer nad segmentami na canvasie
-- [x] 1.4 Klik otwiera popup z polami osoby/strand/przodek (tor podobieństwa)
-- [x] 1.5 Zapis adnotacji z canvas aktualizuje tor fazowania
-- [x] 1.6 Klik na istniejący pasek fazowania otwiera popup edycji
-- [x] 1.7 Edycja/usunięcie przodka z canvas działa
-- [x] 1.8 Klik poza segmentem zamyka popup
-- [x] 1.9 Stare formularze SegmentTable działają bez regresji
+- [x] 1.3 Kursor pointer nad segmentami na canvasie — 4d59f99
+- [x] 1.4 Klik otwiera popup z polami osoby/strand/przodek (tor podobieństwa) — 4d59f99
+- [x] 1.5 Zapis adnotacji z canvas aktualizuje tor fazowania — 4d59f99
+- [x] 1.6 Klik na istniejący pasek fazowania otwiera popup edycji — 4d59f99
+- [x] 1.7 Edycja/usunięcie przodka z canvas działa — 4d59f99
+- [x] 1.8 Klik poza segmentem zamyka popup — 4d59f99
+- [x] 1.9 Stare formularze SegmentTable działają bez regresji — 4d59f99
