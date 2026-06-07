@@ -273,7 +273,7 @@ export default function ResultsPage() {
           <div className="w-60 flex-shrink-0 sticky top-10">
             <AncestorPanel
               ancestors={ancestors}
-              onAdd={handleCreateAncestor}
+              onAdd={async (name, color) => { await handleCreateAncestor(name, color) }}
               onUpdate={handleUpdateAncestor}
               onDelete={handleDeleteAncestor}
             />
