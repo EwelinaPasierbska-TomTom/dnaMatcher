@@ -350,26 +350,26 @@ Brak zmian w backendzie, routingu, ani logice auth. Tylko pliki w `frontend/src/
 
 #### Automated
 
-- [x] 3.1 `npm run build` bez błędów
+- [x] 3.1 `npm run build` bez błędów — 623f085
 
 #### Manual
 
-- [x] 3.2 `/app` wyświetla gradient tło + Dna logo + centered header
-- [x] 3.3 Empty state: duża ikona Dna + tekst zachęty
-- [x] 3.4 Filled state: grid kart z `border-l-4 border-l-blue-500`
-- [x] 3.5 Kliknięcie karty nawiguje do `/results/:id`
-- [x] 3.6 Layout responsywny: 1/2/3 kolumny
+- [x] 3.2 `/app` wyświetla gradient tło + Dna logo + centered header — 623f085
+- [x] 3.3 Empty state: duża ikona Dna + tekst zachęty — 623f085
+- [x] 3.4 Filled state: grid kart z `border-l-4 border-l-blue-500` — 623f085
+- [x] 3.5 Kliknięcie karty nawiguje do `/results/:id` — 623f085
+- [x] 3.6 Layout responsywny: 1/2/3 kolumny — 623f085
 
 ### Phase 4: Redesign ResultsPage + AncestorPanel
 
 #### Automated
 
-- [ ] 4.1 `npm run build` bez błędów
+- [x] 4.1 `npm run build` bez błędów
 
 #### Manual
 
-- [ ] 4.2 `/results/:id` wyświetla gradient tło
-- [ ] 4.3 Przycisk "Powrót" ma ikonę ArrowLeft
-- [ ] 4.4 Przycisk "Usuń" otwiera AlertDialog (nie natywny `confirm()`)
-- [ ] 4.5 Canvas chromosomów działa identycznie — popup adnotacji otwiera się
-- [ ] 4.6 AncestorPanel: dodawanie/edycja/usuwanie przodków działa
+- [x] 4.2 `/results/:id` wyświetla gradient tło
+- [x] 4.3 Przycisk "Powrót" ma ikonę ArrowLeft
+- [x] 4.4 Przycisk "Usuń" otwiera AlertDialog (nie natywny `confirm()`)
+- [x] 4.5 Canvas chromosomów działa identycznie — popup adnotacji otwiera się
+- [x] 4.6 AncestorPanel: dodawanie/edycja/usuwanie przodków działa

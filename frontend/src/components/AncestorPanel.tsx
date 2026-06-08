@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { Pencil, Trash2 } from 'lucide-react'
+import { Button } from './ui/button'
 
 export interface AncestorOut {
   id: string
@@ -105,20 +107,21 @@ export default function AncestorPanel({ ancestors, onAdd, onUpdate, onDelete }: 
                 ))}
               </div>
               <div className="flex gap-2">
-                <button
+                <Button
+                  size="sm"
                   onClick={() => void handleUpdate()}
                   disabled={saving}
-                  className="text-xs bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white px-2 py-1 rounded"
                 >
                   Zapisz
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={() => { setEditId(null); setFormError(null) }}
                   disabled={saving}
-                  className="text-xs text-gray-400 hover:text-gray-600 px-2 py-1"
                 >
                   Anuluj
-                </button>
+                </Button>
               </div>
               {formError && (
                 <p className="text-xs text-red-600">{formError}</p>
@@ -127,24 +130,31 @@ export default function AncestorPanel({ ancestors, onAdd, onUpdate, onDelete }: 
           ) : (
             <li key={a.id} className="flex items-center gap-2 group">
               <span
-                className="w-3 h-3 rounded-full flex-shrink-0"
+                className="inline-block w-4 h-4 rounded-full flex-shrink-0 border border-gray-200"
                 style={{ backgroundColor: a.color }}
               />
               <span className="text-sm text-gray-700 flex-1 truncate">{a.name}</span>
-              <button
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={() => startEdit(a)}
-                className="text-xs text-gray-300 hover:text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity px-1"
+                className="opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0"
                 title="Edytuj"
               >
-                ✎
-              </button>
-              <button
-                onClick={() => { if (window.confirm(`Usunąć przodka "${a.name}"? Wszystkie powiązane adnotacje zostaną usunięte.`)) void onDelete(a.id) }}
-                className="text-xs text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity px-1"
+                <Pencil className="w-3 h-3" />
+              </Button>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => {
+                  if (window.confirm(`Usunąć przodka "${a.name}"? Wszystkie powiązane adnotacje zostaną usunięte.`))
+                    void onDelete(a.id)
+                }}
+                className="opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0"
                 title="Usuń"
               >
-                ×
-              </button>
+                <Trash2 className="w-3 h-3" />
+              </Button>
             </li>
           ),
         )}
@@ -174,32 +184,35 @@ export default function AncestorPanel({ ancestors, onAdd, onUpdate, onDelete }: 
             ))}
           </div>
           <div className="flex gap-2">
-            <button
+            <Button
+              size="sm"
               onClick={() => void handleAdd()}
               disabled={saving || !addName.trim()}
-              className="text-xs bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white px-2 py-1 rounded"
             >
               Dodaj
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => { setAdding(false); setAddName(''); setFormError(null) }}
               disabled={saving}
-              className="text-xs text-gray-400 hover:text-gray-600 px-2 py-1"
             >
               Anuluj
-            </button>
+            </Button>
           </div>
           {formError && (
             <p className="text-xs text-red-600">{formError}</p>
           )}
         </div>
       ) : (
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => setAdding(true)}
-          className="text-xs text-indigo-600 hover:text-indigo-800 font-medium"
+          className="text-blue-600 hover:text-blue-800 w-full justify-start px-0"
         >
           + Dodaj przodka
-        </button>
+        </Button>
       )}
     </div>
   )

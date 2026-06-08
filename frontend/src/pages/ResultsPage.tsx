@@ -1,10 +1,24 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { ArrowLeft, Dna, Trash2 } from 'lucide-react'
 import AncestorPanel, { type AncestorOut } from '../components/AncestorPanel'
 import ChromosomCanvas, { type PairResult } from '../components/ChromosomCanvas'
 import type { AnnotationOut } from '../components/ChromosomeDiagram'
 import { type ProfileMeta, type UpsertAnnotationBody } from '../components/SegmentTable'
 import { apiFetch } from '../lib/api'
+import { Button } from '../components/ui/button'
+import { Card, CardContent } from '../components/ui/card'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '../components/ui/alert-dialog'
 
 interface ComparisonData {
   id: string
@@ -122,8 +136,7 @@ export default function ResultsPage() {
     setAnnotations((prev) => prev.filter((a) => a.ancestor_id !== id))
   }
 
-  async function handleDelete() {
-    if (!confirm('Usunąć to porównanie?')) return
+  async function executeDelete() {
     setDeleting(true)
     try {
       await apiFetch(`/api/comparisons/${id}`, { method: 'DELETE' })
@@ -136,15 +149,18 @@ export default function ResultsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-gray-500">Ładowanie…</p>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center">
+        <div className="flex items-center gap-3">
+          <Dna className="w-8 h-8 text-blue-600 animate-spin" />
+          <span className="text-lg text-gray-600">Ładowanie…</span>
+        </div>
       </div>
     )
   }
 
   if (error || !data) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center">
         <p className="text-red-600">{error ?? 'Błąd ładowania.'}</p>
       </div>
     )
@@ -155,7 +171,7 @@ export default function ResultsPage() {
   })
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 py-10 px-4">
       <div className="max-w-5xl mx-auto">
         <div className="flex gap-6 items-start">
           {/* main content */}
@@ -165,37 +181,52 @@ export default function ResultsPage() {
                 <h1 className="text-2xl font-bold text-gray-900">{data.name}</h1>
                 <p className="text-sm text-gray-500 mt-1">{date}</p>
               </div>
-              <div className="flex gap-3">
-                <button
-                  onClick={() => navigate('/app')}
-                  className="text-sm text-gray-500 hover:text-gray-700"
-                >
-                  ← Powrót
-                </button>
-                <button
-                  onClick={() => void handleDelete()}
-                  disabled={deleting}
-                  className="text-sm text-red-500 hover:text-red-700 disabled:opacity-50"
-                >
-                  {deleting ? 'Usuwanie…' : 'Usuń porównanie'}
-                </button>
+              <div className="flex gap-2">
+                <Button variant="ghost" size="sm" onClick={() => navigate('/app')}>
+                  <ArrowLeft className="w-4 h-4 mr-1" />
+                  Powrót
+                </Button>
+
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive" size="sm" disabled={deleting}>
+                      <Trash2 className="w-4 h-4 mr-1" />
+                      {deleting ? 'Usuwanie…' : 'Usuń porównanie'}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Usuń porównanie</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Tej operacji nie można cofnąć. Porównanie „{data.name}" zostanie trwale usunięte.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Anuluj</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => void executeDelete()}>
+                        Usuń
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             </div>
 
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
-              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
-                Diagram chromosomów
-              </h3>
-              <ChromosomCanvas
-                pairs={data.pairs}
-                allProfiles={data.profiles}
-                annotations={annotations}
-                ancestors={ancestors}
-                onAnnotate={handleUpsertAnnotation}
-                onDeleteAnnotation={handleDeleteAnnotation}
-              />
-            </div>
-
+            <Card>
+              <CardContent className="p-4">
+                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
+                  Diagram chromosomów
+                </h3>
+                <ChromosomCanvas
+                  pairs={data.pairs}
+                  allProfiles={data.profiles}
+                  annotations={annotations}
+                  ancestors={ancestors}
+                  onAnnotate={handleUpsertAnnotation}
+                  onDeleteAnnotation={handleDeleteAnnotation}
+                />
+              </CardContent>
+            </Card>
           </div>
 
           {/* sidebar */}
