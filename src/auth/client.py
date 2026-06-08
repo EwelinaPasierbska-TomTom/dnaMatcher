@@ -2,6 +2,7 @@ import os
 from functools import cache
 
 import httpx
+
 from supabase import Client, create_client
 
 
