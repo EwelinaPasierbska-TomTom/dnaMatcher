@@ -211,7 +211,9 @@ export default function ChromosomSection({
   useEffect(() => {
     if (!open || containerWidth === 0) return
 
-    const phasingTrackWidth = Math.max(1, containerWidth - CANVAS_MARGIN * 2)
+    // Use same canvas width and data offset as similarity tracks for perfect alignment
+    const phWidth = simTrackWidth
+    const phDataW = Math.max(1, phWidth - PAIR_LABEL_WIDTH)
     const newAllHits: HitTarget[][] = []
 
     for (let pp = 0; pp < phasingPersons.length; pp++) {
@@ -224,9 +226,9 @@ export default function ChromosomSection({
       }
 
       const dpr = window.devicePixelRatio || 1
-      canvas.width = Math.round(phasingTrackWidth * dpr)
+      canvas.width = Math.round(phWidth * dpr)
       canvas.height = Math.round(PHASING_TRACK_HEIGHT * dpr)
-      canvas.style.width = `${phasingTrackWidth}px`
+      canvas.style.width = `${phWidth}px`
       canvas.style.height = `${PHASING_TRACK_HEIGHT}px`
 
       const ctx = canvas.getContext('2d')
@@ -234,8 +236,18 @@ export default function ChromosomSection({
       ctx.scale(dpr, dpr)
 
       const halfH = PHASING_TRACK_HEIGHT / 2
+
+      // Person name label on the left (same position as pair labels in similarity)
+      ctx.font = '10px system-ui, sans-serif'
+      ctx.textBaseline = 'middle'
+      ctx.fillStyle = '#6b7280'
+      ctx.textAlign = 'right'
+      const nameLabel = person.name.length > 11 ? person.name.slice(0, 10) + '…' : person.name
+      ctx.fillText(nameLabel, PAIR_LABEL_WIDTH - 4, halfH)
+
+      // Gray background for data area (right of label)
       ctx.fillStyle = '#e5e7eb'
-      ctx.fillRect(0, 0, phasingTrackWidth, PHASING_TRACK_HEIGHT)
+      ctx.fillRect(PAIR_LABEL_WIDTH, 0, phDataW, PHASING_TRACK_HEIGHT)
 
       const personAnns = annotations.filter(
         a => a.profile_id === person.id && a.chromosome === chrom,
@@ -245,8 +257,8 @@ export default function ChromosomSection({
 
       // Annotation hits FIRST (take priority over gray-track hits below)
       for (const ann of personAnns) {
-        const x = ((ann.start_position - rangeStart) / rangeWidth) * phasingTrackWidth
-        const w = Math.max(2, ((ann.end_position - ann.start_position) / rangeWidth) * phasingTrackWidth)
+        const x = PAIR_LABEL_WIDTH + ((ann.start_position - rangeStart) / rangeWidth) * phDataW
+        const w = Math.max(2, ((ann.end_position - ann.start_position) / rangeWidth) * phDataW)
         const color =
           ann.ancestor_id && ancestorColorMap[ann.ancestor_id]
             ? ancestorColorMap[ann.ancestor_id]
@@ -270,12 +282,12 @@ export default function ChromosomSection({
 
       // Gray-track catch-all hits AFTER annotation hits
       hits.push({
-        x: 0, y: 0, w: phasingTrackWidth, h: halfH,
+        x: PAIR_LABEL_WIDTH, y: 0, w: phDataW, h: halfH,
         tooltipContent: `${person.name} — maternal: kliknij aby dodać adnotację`,
         payload: { type: 'phasing-track', person, chromosome: chrom, strand: 'maternal', approxBp: 0 },
       })
       hits.push({
-        x: 0, y: halfH, w: phasingTrackWidth, h: halfH,
+        x: PAIR_LABEL_WIDTH, y: halfH, w: phDataW, h: halfH,
         tooltipContent: `${person.name} — paternal: kliknij aby dodać adnotację`,
         payload: { type: 'phasing-track', person, chromosome: chrom, strand: 'paternal', approxBp: 0 },
       })
@@ -329,14 +341,14 @@ export default function ChromosomSection({
 
   function handlePhasingClick(pp: number, e: React.MouseEvent<HTMLCanvasElement>) {
     const rect = e.currentTarget.getBoundingClientRect()
-    const phasingTrackWidth = Math.max(1, containerWidth - CANVAS_MARGIN * 2)
     const mx = e.clientX - rect.left
     const my = e.clientY - rect.top
     const hits = phasingHits.current[pp] ?? []
     const hit = findHit(hits, mx, my)
     if (!hit) { setTooltip(null); return }
     if (hit.payload.type === 'phasing-track') {
-      const approxBp = Math.round(rangeStart + (mx / phasingTrackWidth) * rangeWidth)
+      const phDataW = Math.max(1, simTrackWidth - PAIR_LABEL_WIDTH)
+      const approxBp = Math.round(rangeStart + ((mx - PAIR_LABEL_WIDTH) / phDataW) * rangeWidth)
       onPopupRequest({ ...hit.payload, approxBp }, e.clientX, e.clientY)
     } else {
       onPopupRequest(hit.payload, e.clientX, e.clientY)
@@ -379,20 +391,15 @@ export default function ChromosomSection({
           {phasingPersons.length > 0 && (
             <div className="space-y-1">
               {phasingPersons.map((person, pp) => (
-                <div key={person.id} className="flex items-center gap-2">
-                  <span className="w-20 shrink-0 truncate text-xs text-gray-600 text-right pr-1">
-                    {person.name}
-                  </span>
-                  <div className="relative flex-1" style={{ margin: `0 ${CANVAS_MARGIN}px` }}>
-                    <canvas
-                      ref={el => { phasingCanvasRefs.current[pp] = el }}
-                      onMouseMove={e => handlePhasingMouseMove(pp, e)}
-                      onMouseLeave={() => setTooltip(null)}
-                      onClick={e => handlePhasingClick(pp, e)}
-                      className="block w-full"
-                      style={{ cursor: 'crosshair' }}
-                    />
-                  </div>
+                <div key={person.id} style={{ marginLeft: CANVAS_MARGIN, marginRight: CANVAS_MARGIN }}>
+                  <canvas
+                    ref={el => { phasingCanvasRefs.current[pp] = el }}
+                    onMouseMove={e => handlePhasingMouseMove(pp, e)}
+                    onMouseLeave={() => setTooltip(null)}
+                    onClick={e => handlePhasingClick(pp, e)}
+                    className="block"
+                    style={{ cursor: 'crosshair' }}
+                  />
                 </div>
               ))}
             </div>
