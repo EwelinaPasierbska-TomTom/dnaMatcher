@@ -233,15 +233,15 @@ Każda sekcja przekazuje `px = e.clientX`, `py = e.clientY` do `onPopupRequest` 
 
 #### Automated
 
-- [x] 1.1 `cd frontend && npx tsc --noEmit` exits 0
-- [x] 1.2 `uv run pytest` exits 0
+- [x] 1.1 `cd frontend && npx tsc --noEmit` exits 0 — 42e9f06
+- [x] 1.2 `uv run pytest` exits 0 — 42e9f06
 
 #### Manual
 
-- [x] 1.3 N zwijanych sekcji domyślnie zamkniętych
-- [x] 1.4 Klik nagłówka → sekcja otwiera/zamyka
-- [x] 1.5 Canvas podobieństwa z pasami 20px i poprawnymi segmentami
-- [x] 1.6 Etykiety osób (HTML) + canvas fazowania 28px per osoba
-- [x] 1.7 Tabela segmentów z danymi (para, typ, bp, cM, SNPs)
-- [x] 1.8 Hover tooltip + klik popup działają po refaktorze
-- [x] 1.9 Popup tworzenia adnotacji (szary tor) działa
+- [x] 1.3 N zwijanych sekcji domyślnie zamkniętych — 42e9f06
+- [x] 1.4 Klik nagłówka → sekcja otwiera/zamyka — 42e9f06
+- [x] 1.5 Canvas podobieństwa z pasami 20px i poprawnymi segmentami — 42e9f06
+- [x] 1.6 Etykiety osób (HTML) + canvas fazowania 28px per osoba — 42e9f06
+- [x] 1.7 Tabela segmentów z danymi (para, typ, bp, cM, SNPs) — 42e9f06
+- [x] 1.8 Hover tooltip + klik popup działają po refaktorze — 42e9f06
+- [x] 1.9 Popup tworzenia adnotacji (szary tor) działa — 42e9f06
