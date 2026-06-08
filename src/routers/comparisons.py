@@ -39,10 +39,16 @@ class SegmentOut(BaseModel):
     density: float | None
 
 
+class ChromosomeBoundsOut(BaseModel):
+    start_bp: int
+    end_bp: int
+
+
 class PairResult(BaseModel):
     profile_ids: list[UUID]
     person_names: list[str]
     segments: list[SegmentOut]
+    chromosome_bounds: dict[str, ChromosomeBoundsOut]
 
 
 class ComparisonResponse(BaseModel):
@@ -93,6 +99,18 @@ def _segments_to_pair_result(
     profile_ids: list[UUID],
     person_names: list[str],
 ) -> PairResult:
+    bounds: dict[str, ChromosomeBoundsOut] = {}
+    for s in segments:
+        existing = bounds.get(s.chromosome)
+        if existing is None:
+            bounds[s.chromosome] = ChromosomeBoundsOut(
+                start_bp=s.start_bp, end_bp=s.end_bp
+            )
+        else:
+            bounds[s.chromosome] = ChromosomeBoundsOut(
+                start_bp=min(existing.start_bp, s.start_bp),
+                end_bp=max(existing.end_bp, s.end_bp),
+            )
     return PairResult(
         profile_ids=profile_ids,
         person_names=person_names,
@@ -111,6 +129,7 @@ def _segments_to_pair_result(
             )
             for s in segments
         ],
+        chromosome_bounds=bounds,
     )
 
 

@@ -5,10 +5,16 @@ import type { PhasingPayload, PopupPayload, SimPayload } from './AnnotationPopup
 import type { AnnotationOut, SegmentOut } from './ChromosomeDiagram'
 import type { ProfileMeta, UpsertAnnotationBody } from './SegmentTable'
 
+export interface ChromosomeBounds {
+  start_bp: number
+  end_bp: number
+}
+
 export interface PairResult {
   profile_ids: string[]
   person_names: string[]
   segments: SegmentOut[]
+  chromosome_bounds: Record<string, ChromosomeBounds>
 }
 
 // Human genome reference lengths (hg38), in base pairs
