@@ -336,29 +336,29 @@ Brak zmian w backendzie, routingu, ani logice auth. Tylko pliki w `frontend/src/
 
 #### Automated
 
-- [x] 2.1 `npm run build` bez błędów TypeScript
-- [x] 2.2 Brak broken imports
+- [x] 2.1 `npm run build` bez błędów TypeScript — 6f7eea6
+- [x] 2.2 Brak broken imports — 6f7eea6
 
 #### Manual
 
-- [x] 2.3 `/login` wyświetla gradient tło + ikonę DNA + "dnaMatcher" + Card z formularzem
-- [x] 2.4 `/signup` ma identyczny wygląd z 4 polami
-- [x] 2.5 Logowanie działa z poprawnymi danymi
-- [x] 2.6 Błędy auth wyświetlają się inline
+- [x] 2.3 `/login` wyświetla gradient tło + ikonę DNA + "dnaMatcher" + Card z formularzem — 6f7eea6
+- [x] 2.4 `/signup` ma identyczny wygląd z 4 polami — 6f7eea6
+- [x] 2.5 Logowanie działa z poprawnymi danymi — 6f7eea6
+- [x] 2.6 Błędy auth wyświetlają się inline — 6f7eea6
 
 ### Phase 3: Redesign Dashboard (AppPage)
 
 #### Automated
 
-- [ ] 3.1 `npm run build` bez błędów
+- [x] 3.1 `npm run build` bez błędów
 
 #### Manual
 
-- [ ] 3.2 `/app` wyświetla gradient tło + Dna logo + centered header
-- [ ] 3.3 Empty state: duża ikona Dna + tekst zachęty
-- [ ] 3.4 Filled state: grid kart z `border-l-4 border-l-blue-500`
-- [ ] 3.5 Kliknięcie karty nawiguje do `/results/:id`
-- [ ] 3.6 Layout responsywny: 1/2/3 kolumny
+- [x] 3.2 `/app` wyświetla gradient tło + Dna logo + centered header
+- [x] 3.3 Empty state: duża ikona Dna + tekst zachęty
+- [x] 3.4 Filled state: grid kart z `border-l-4 border-l-blue-500`
+- [x] 3.5 Kliknięcie karty nawiguje do `/results/:id`
+- [x] 3.6 Layout responsywny: 1/2/3 kolumny
 
 ### Phase 4: Redesign ResultsPage + AncestorPanel
 

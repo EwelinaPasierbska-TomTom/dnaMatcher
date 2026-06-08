@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Dna, LogOut, Plus } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { apiFetch } from '../lib/api'
+import { Button } from '../components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 
 interface ComparisonSummary {
   id: string
@@ -35,65 +38,71 @@ export default function AppPage() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10 px-4">
-      <div className="max-w-2xl mx-auto space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 p-6">
+      <div className="max-w-6xl mx-auto">
+
         {/* Header */}
-        <div className="bg-white rounded-lg shadow px-6 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-gray-900">dnaMatcher</h1>
-            <p className="text-sm text-gray-500">{user?.email}</p>
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <Dna className="w-10 h-10 text-blue-600" />
+            <h1 className="text-4xl font-bold text-gray-900">dnaMatcher</h1>
           </div>
-          <button
-            onClick={() => void signOut()}
-            className="text-sm text-red-600 hover:text-red-800 font-medium"
-          >
-            Wyloguj się
-          </button>
+          <p className="text-lg text-gray-600">Analizuj i porównuj segmenty DNA</p>
+          <div className="flex items-center justify-center gap-2 mt-4">
+            <span className="text-sm text-gray-500">{user?.email}</span>
+            <Button variant="ghost" size="sm" onClick={() => void signOut()}>
+              <LogOut className="w-4 h-4 mr-1" />
+              Wyloguj się
+            </Button>
+          </div>
         </div>
 
-        {/* New comparison */}
-        <button
-          onClick={() => navigate('/compare')}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors"
-        >
-          + Nowe porównanie
-        </button>
+        {/* New comparison button */}
+        <div className="flex justify-center mb-8">
+          <Button size="lg" onClick={() => navigate('/compare')}>
+            <Plus className="w-5 h-5 mr-2" />
+            Nowe porównanie
+          </Button>
+        </div>
 
-        {/* History */}
-        <div>
-          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
-            Historia porównań
-          </h2>
+        {/* Comparisons list */}
+        {error && <p className="text-red-600 text-sm text-center mb-4">{error}</p>}
 
-          {error && <p className="text-red-600 text-sm mb-3">{error}</p>}
-          {loading ? (
-            <p className="text-sm text-gray-400 text-center py-8">Ładowanie…</p>
-          ) : comparisons.length === 0 && !error ? (
-            <div className="bg-white rounded-lg shadow px-6 py-10 text-center">
-              <p className="text-gray-400">
-                Brak porównań. Kliknij &quot;Nowe porównanie&quot; aby zacząć.
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-3">
+        {loading ? (
+          <div className="text-center py-12">
+            <Dna className="w-12 h-12 text-gray-300 mx-auto mb-4 animate-spin" />
+            <p className="text-gray-500">Ładowanie…</p>
+          </div>
+        ) : comparisons.length === 0 && !error ? (
+          <div className="text-center py-12">
+            <Dna className="w-24 h-24 text-gray-300 mx-auto mb-4" />
+            <h3 className="text-xl font-medium text-gray-500 mb-2">Brak porównań</h3>
+            <p className="text-gray-400">Kliknij &quot;Nowe porównanie&quot; aby zacząć.</p>
+          </div>
+        ) : (
+          <div>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-6">Historia porównań</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {comparisons.map((c) => (
-                <button
+                <Card
                   key={c.id}
+                  className="border-l-4 border-l-blue-500 hover:shadow-lg transition-shadow cursor-pointer"
                   onClick={() => navigate(`/results/${c.id}`)}
-                  className="w-full bg-white rounded-lg shadow px-6 py-4 text-left hover:shadow-md transition-shadow"
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium text-gray-900">{c.name}</span>
-                    <span className="text-xs text-gray-400">
+                  <CardHeader>
+                    <CardTitle className="text-xl">{c.name}</CardTitle>
+                    <CardDescription>
                       {new Date(c.created_at).toLocaleDateString('pl-PL')}
-                    </span>
-                  </div>
-                  <p className="text-sm text-gray-500 mt-1">{c.person_names.join(' · ')}</p>
-                </button>
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-gray-500">{c.person_names.join(' · ')}</p>
+                  </CardContent>
+                </Card>
               ))}
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   )
