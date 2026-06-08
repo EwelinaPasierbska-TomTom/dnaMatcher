@@ -51,6 +51,7 @@ interface TooltipState {
 
 interface SegmentRow {
   pairLabel: string
+  pairIndex: number
   match_type: string
   start_bp: number
   end_bp: number
@@ -116,13 +117,15 @@ export default function ChromosomSection({
   const simHeight = PAD + nPairs * (SIM_TRACK_HEIGHT + TRACK_GAP) + PAD
   const simTrackWidth = Math.max(1, containerWidth - CANVAS_MARGIN * 2)
 
-  // Segment rows for this chromosome (all pairs including 3-way)
+  // Segment rows for this chromosome — sorted by pair order (matching canvas tracks),
+  // 3-way pair ("Grupowe") appears last.
   const chromSegs: SegmentRow[] = pairwisePairs
-    .flatMap(pair =>
+    .flatMap((pair, pi) =>
       pair.segments
         .filter(s => s.chromosome === chrom)
         .map(s => ({
-          pairLabel: pair.person_names.join(pair.profile_ids.length > 2 ? ' + ' : ' vs '),
+          pairLabel: pair.profile_ids.length > 2 ? 'Grupowe' : pair.person_names.join(' vs '),
+          pairIndex: pi,
           match_type: s.match_type,
           start_bp: s.start_bp,
           end_bp: s.end_bp,
@@ -130,7 +133,7 @@ export default function ChromosomSection({
           snp_count: s.snp_count,
         })),
     )
-    .sort((a, b) => a.start_bp - b.start_bp)
+    .sort((a, b) => a.pairIndex - b.pairIndex || a.start_bp - b.start_bp)
 
   // ---------------------------------------------------------------------------
   // Draw similarity canvas
@@ -161,8 +164,9 @@ export default function ChromosomSection({
     for (let pi = 0; pi < pairwisePairs.length; pi++) {
       const pair = pairwisePairs[pi]
       const trackY = PAD + pi * (SIM_TRACK_HEIGHT + TRACK_GAP)
-      const isTriplet = pair.profile_ids.length > 2
-      const pairLabel = pair.person_names.join(isTriplet ? ' + ' : ' vs ')
+      const pairLabel = pair.profile_ids.length > 2
+        ? 'Grupowe'
+        : pair.person_names.join(' vs ')
 
       // Pair label on the left
       ctx.fillStyle = '#6b7280'

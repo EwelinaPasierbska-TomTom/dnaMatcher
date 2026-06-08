@@ -156,7 +156,7 @@ export default function ChromosomCanvas({
         {pairs.map((pair, i) => (
           <span key={i} className="flex items-center gap-1">
             <span className="inline-block h-2.5 w-4 rounded-sm bg-gray-300" />
-            {pair.person_names.join(pair.profile_ids.length > 2 ? ' + ' : ' vs ')}
+            {pair.profile_ids.length > 2 ? 'Grupowe' : pair.person_names.join(' vs ')}
           </span>
         ))}
         <span className="ml-2 font-medium text-gray-600">Wynik:</span>
