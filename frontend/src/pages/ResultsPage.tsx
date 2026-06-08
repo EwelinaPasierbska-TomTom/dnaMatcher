@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import AncestorPanel, { type AncestorOut } from '../components/AncestorPanel'
 import ChromosomCanvas, { type PairResult } from '../components/ChromosomCanvas'
 import type { AnnotationOut } from '../components/ChromosomeDiagram'
-import SegmentTable, { type ProfileMeta, type UpsertAnnotationBody } from '../components/SegmentTable'
+import { type ProfileMeta, type UpsertAnnotationBody } from '../components/SegmentTable'
 import { apiFetch } from '../lib/api'
 
 interface ComparisonData {
@@ -12,64 +12,6 @@ interface ComparisonData {
   created_at: string
   profiles: ProfileMeta[]
   pairs: PairResult[]
-}
-
-interface PairSectionProps {
-  pair: PairResult
-  defaultOpen: boolean
-  profiles: ProfileMeta[]
-  annotations: AnnotationOut[]
-  ancestors: AncestorOut[]
-  onAnnotate: (body: UpsertAnnotationBody) => Promise<void>
-  onDeleteAnnotation: (id: string) => Promise<void>
-  onCreateAncestor: (name: string, color: string) => Promise<AncestorOut>
-}
-
-function PairSection({
-  pair,
-  defaultOpen,
-  profiles,
-  annotations,
-  ancestors,
-  onAnnotate,
-  onDeleteAnnotation,
-  onCreateAncestor,
-}: PairSectionProps) {
-  const [open, setOpen] = useState(defaultOpen)
-  const label =
-    pair.person_names.length === 2
-      ? `${pair.person_names[0]} vs ${pair.person_names[1]}`
-      : pair.person_names.join(' vs ') + ' (3-way)'
-
-  const pairProfiles = profiles.filter((p) => pair.profile_ids.includes(p.id))
-
-  return (
-    <div className="border border-gray-200 rounded-lg overflow-hidden">
-      <button
-        onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center justify-between px-5 py-3 bg-gray-50 hover:bg-gray-100 transition-colors text-left"
-      >
-        <span className="font-medium text-gray-800">{label}</span>
-        <span className="text-gray-400 text-sm">{open ? '▲' : '▼'}</span>
-      </button>
-      {open && (
-        <div className="p-5">
-          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
-            Segmenty ({pair.segments.length})
-          </h3>
-          <SegmentTable
-            segments={pair.segments}
-            profiles={pairProfiles}
-            annotations={annotations}
-            ancestors={ancestors}
-            onAnnotate={onAnnotate}
-            onDeleteAnnotation={onDeleteAnnotation}
-            onCreateAncestor={onCreateAncestor}
-          />
-        </div>
-      )}
-    </div>
-  )
 }
 
 export default function ResultsPage() {
@@ -254,21 +196,6 @@ export default function ResultsPage() {
               />
             </div>
 
-            <div className="space-y-3">
-              {data.pairs.map((pair, i) => (
-                <PairSection
-                  key={i}
-                  pair={pair}
-                  defaultOpen={i === 0}
-                  profiles={data.profiles}
-                  annotations={annotations}
-                  ancestors={ancestors}
-                  onAnnotate={handleUpsertAnnotation}
-                  onDeleteAnnotation={handleDeleteAnnotation}
-                  onCreateAncestor={handleCreateAncestor}
-                />
-              ))}
-            </div>
           </div>
 
           {/* sidebar */}
