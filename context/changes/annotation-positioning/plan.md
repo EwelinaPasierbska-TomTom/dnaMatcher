@@ -320,27 +320,27 @@ Uwaga: `chromBounds` jest obliczany w draw effect (useRef lub useMemo) i musi by
 
 #### Automated
 
-- [x] 1.1 `uv run pytest` exits 0
-- [x] 1.2 `uv run mypy .` exits 0
-- [x] 1.3 `uv run ruff check .` exits 0
-- [x] 1.4 `cd frontend && npx tsc --noEmit` exits 0
+- [x] 1.1 `uv run pytest` exits 0 — 4fb5c73
+- [x] 1.2 `uv run mypy .` exits 0 — 4fb5c73
+- [x] 1.3 `uv run ruff check .` exits 0 — 4fb5c73
+- [x] 1.4 `cd frontend && npx tsc --noEmit` exits 0 — 4fb5c73
 
 #### Manual
 
-- [x] 1.5 GET /api/comparisons/{id} zwraca pairs[].chromosome_bounds z poprawnymi wartościami
+- [x] 1.5 GET /api/comparisons/{id} zwraca pairs[].chromosome_bounds z poprawnymi wartościami — 4fb5c73
 
 ### Phase 2: Frontend — nowe skalowanie + popup z pozycjami
 
 #### Automated
 
-- [ ] 2.1 `uv run pytest` exits 0
-- [ ] 2.2 `cd frontend && npx tsc --noEmit` exits 0
+- [x] 2.1 `uv run pytest` exits 0
+- [x] 2.2 `cd frontend && npx tsc --noEmit` exits 0
 
 #### Manual
 
-- [ ] 2.3 Canvas: chromosom skalowany od pierwszej do ostatniej pozycji SNP (nie od 0 do hg38 end)
-- [ ] 2.4 Klik szary tor fazowania → popup tworzenia z pre-filled approxBp i edytowalnymi start/end
-- [ ] 2.5 Zapisanie nowej adnotacji fazowania z canvas działa, pasek widoczny na torze
-- [ ] 2.6 Klik istniejący pasek → popup edycji z pre-filled start/end
-- [ ] 2.7 Zmiana pozycji (start/end) → stara adnotacja usunięta, nowa w nowej pozycji
-- [ ] 2.8 Zmiana tylko przodka (bez zmiany pozycji) → jeden request, brak duplikatu
+- [x] 2.3 Canvas: chromosom skalowany od pierwszej do ostatniej pozycji SNP (nie od 0 do hg38 end)
+- [x] 2.4 Klik szary tor fazowania → popup tworzenia z pre-filled approxBp i edytowalnymi start/end
+- [x] 2.5 Zapisanie nowej adnotacji fazowania z canvas działa, pasek widoczny na torze
+- [x] 2.6 Klik istniejący pasek → popup edycji z pre-filled start/end
+- [x] 2.7 Zmiana pozycji (start/end) → stara adnotacja usunięta, nowa w nowej pozycji
+- [x] 2.8 Zmiana tylko przodka (bez zmiany pozycji) → jeden request, brak duplikatu

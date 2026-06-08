@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { AncestorOut } from './AncestorPanel'
 import AnnotationPopup from './AnnotationPopup'
-import type { PhasingPayload, PopupPayload, SimPayload } from './AnnotationPopup'
+import type { PhasingPayload, PhasingTrackPayload, PopupPayload, SimPayload } from './AnnotationPopup'
 import type { AnnotationOut, SegmentOut } from './ChromosomeDiagram'
 import type { ProfileMeta, UpsertAnnotationBody } from './SegmentTable'
 
@@ -46,7 +46,7 @@ interface HitTarget {
   w: number
   h: number
   tooltipContent: string
-  payload: SimPayload | PhasingPayload
+  payload: SimPayload | PhasingPayload | PhasingTrackPayload
 }
 
 interface Props {
@@ -71,6 +71,7 @@ export default function ChromosomCanvas({
   const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const hitTargets = useRef<HitTarget[]>([])
+  const chromBoundsRef = useRef<Record<string, { start: number; end: number }>>({})
   const [tooltip, setTooltip] = useState<{ x: number; y: number; content: string } | null>(null)
   const [popup, setPopup] = useState<PopupPayload | null>(null)
   const [width, setWidth] = useState(0)
@@ -145,13 +146,29 @@ export default function ChromosomCanvas({
     const trackWidth = width - LABEL_WIDTH - 8
     const newHits: HitTarget[] = []
 
+    // Merge chromosome bounds from all pairwise pairs for accurate scaling
+    const newChromBounds: Record<string, { start: number; end: number }> = {}
+    for (const pair of pairwisePairs) {
+      for (const [chrom, b] of Object.entries(pair.chromosome_bounds)) {
+        const cur = newChromBounds[chrom]
+        if (!cur) newChromBounds[chrom] = { start: b.start_bp, end: b.end_bp }
+        else {
+          cur.start = Math.min(cur.start, b.start_bp)
+          cur.end = Math.max(cur.end, b.end_bp)
+        }
+      }
+    }
+    chromBoundsRef.current = newChromBounds
+
     ctx.clearRect(0, 0, width, totalHeight)
     ctx.font = '10px system-ui, sans-serif'
     ctx.textBaseline = 'middle'
 
     for (let ci = 0; ci < chromsWithData.length; ci++) {
       const chrom = chromsWithData[ci]
-      const chromLen = lengths[chrom] ?? 1
+      const bounds = newChromBounds[chrom] ?? { start: 0, end: lengths[chrom] ?? 1 }
+      const rangeStart = bounds.start
+      const rangeWidth = bounds.end - bounds.start || 1
       const chromY = PAD + ci * (chromGroupHeight + CHROM_GAP)
       const labelY = chromY + chromGroupHeight / 2
 
@@ -172,8 +189,8 @@ export default function ChromosomCanvas({
         // Colored segments
         for (const seg of pair.segments) {
           if (seg.chromosome !== chrom) continue
-          const x = LABEL_WIDTH + (seg.start_bp / chromLen) * trackWidth
-          const w = Math.max(1, ((seg.end_bp - seg.start_bp) / chromLen) * trackWidth)
+          const x = LABEL_WIDTH + ((seg.start_bp - rangeStart) / rangeWidth) * trackWidth
+          const w = Math.max(1, ((seg.end_bp - seg.start_bp) / rangeWidth) * trackWidth)
 
           ctx.fillStyle = COLORS[seg.match_type] ?? '#9ca3af'
           ctx.fillRect(x, trackY, w, SIM_TRACK_HEIGHT)
@@ -204,8 +221,8 @@ export default function ChromosomCanvas({
         )
 
         for (const ann of personAnns) {
-          const x = LABEL_WIDTH + (ann.start_position / chromLen) * trackWidth
-          const w = Math.max(1, ((ann.end_position - ann.start_position) / chromLen) * trackWidth)
+          const x = LABEL_WIDTH + ((ann.start_position - rangeStart) / rangeWidth) * trackWidth
+          const w = Math.max(1, ((ann.end_position - ann.start_position) / rangeWidth) * trackWidth)
           const color =
             ann.ancestor_id && ancestorColorMap[ann.ancestor_id]
               ? ancestorColorMap[ann.ancestor_id]
@@ -219,6 +236,7 @@ export default function ChromosomCanvas({
           }
 
           const ancestorSuffix = ann.ancestor_label ? ` → ${ann.ancestor_label}` : ''
+          // Annotation hits added FIRST — they take priority over gray-track hits below
           newHits.push({
             x,
             y: ann.strand === 'maternal' ? trackY : trackY + halfH,
@@ -228,6 +246,18 @@ export default function ChromosomCanvas({
             payload: { type: 'phasing', annotation: ann, person, strand: ann.strand },
           })
         }
+
+        // Gray-track hits added AFTER annotation hits — they're the catch-all for empty areas
+        newHits.push({
+          x: LABEL_WIDTH, y: trackY, w: trackWidth, h: halfH,
+          tooltipContent: `${person.name} — maternal: kliknij aby dodać adnotację`,
+          payload: { type: 'phasing-track', person, chromosome: chrom, strand: 'maternal', approxBp: 0 },
+        })
+        newHits.push({
+          x: LABEL_WIDTH, y: trackY + halfH, w: trackWidth, h: halfH,
+          tooltipContent: `${person.name} — paternal: kliknij aby dodać adnotację`,
+          payload: { type: 'phasing-track', person, chromosome: chrom, strand: 'paternal', approxBp: 0 },
+        })
       }
     }
 
@@ -263,7 +293,18 @@ export default function ChromosomCanvas({
     const ch = containerRef.current?.clientHeight ?? totalHeight
     const px = mx + 200 > cw ? mx - 216 : mx
     const py = my + 120 > ch ? my - 120 : my
-    setPopup({ ...hit.payload, px, py })
+
+    if (hit.payload.type === 'phasing-track') {
+      // Compute approximate genomic position from click x-coordinate
+      const b = chromBoundsRef.current[hit.payload.chromosome]
+      const rStart = b?.start ?? 0
+      const rWidth = b ? (b.end - b.start || 1) : 1
+      const tWidth = width - LABEL_WIDTH - 8
+      const approxBp = Math.round(rStart + ((mx - LABEL_WIDTH) / tWidth) * rWidth)
+      setPopup({ ...hit.payload, approxBp, px, py })
+    } else {
+      setPopup({ ...hit.payload, px, py })
+    }
   }
 
   if (pairwisePairs.length === 0 || chromsWithData.length === 0) return null

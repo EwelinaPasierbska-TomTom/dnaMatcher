@@ -23,7 +23,18 @@ export interface PhasingPayload {
   strand: 'maternal' | 'paternal'
 }
 
-export type PopupPayload = (SimPayload | PhasingPayload) & { px: number; py: number }
+export interface PhasingTrackPayload {
+  type: 'phasing-track'
+  person: ProfileMeta
+  chromosome: string
+  strand: 'maternal' | 'paternal'
+  approxBp: number
+}
+
+export type PopupPayload =
+  | (SimPayload & { px: number; py: number })
+  | (PhasingPayload & { px: number; py: number })
+  | (PhasingTrackPayload & { px: number; py: number })
 
 // ---------------------------------------------------------------------------
 // Component
@@ -46,15 +57,22 @@ export default function AnnotationPopup({
 }: Props) {
   const sim = popup.type === 'sim' ? popup : null
   const phasing = popup.type === 'phasing' ? popup : null
+  const track = popup.type === 'phasing-track' ? popup : null
 
   const [profileId, setProfileId] = useState<string>(
     () => sim?.pair.profile_ids[0] ?? '',
   )
   const [strand, setStrand] = useState<'maternal' | 'paternal'>(
-    () => phasing?.strand ?? 'maternal',
+    () => phasing?.strand ?? track?.strand ?? 'maternal',
   )
   const [ancestorId, setAncestorId] = useState<string>(
     () => phasing?.annotation.ancestor_id ?? ancestors[0]?.id ?? '',
+  )
+  const [startBp, setStartBp] = useState<number>(
+    () => phasing?.annotation.start_position ?? track?.approxBp ?? 0,
+  )
+  const [endBp, setEndBp] = useState<number>(
+    () => phasing?.annotation.end_position ?? (track ? track.approxBp + 1 : 0),
   )
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -64,6 +82,10 @@ export default function AnnotationPopup({
     const ancestor = ancestors.find(a => a.id === ancestorId)
     if (!ancestor) {
       setError('Wybrany przodek nie istnieje. Wybierz innego.')
+      return
+    }
+    if ((phasing || track) && startBp >= endBp) {
+      setError('Start musi być mniejszy niż koniec.')
       return
     }
 
@@ -81,12 +103,28 @@ export default function AnnotationPopup({
           ancestor_label: ancestor.name,
         })
       } else if (phasing) {
+        const posChanged =
+          startBp !== phasing.annotation.start_position ||
+          endBp !== phasing.annotation.end_position
+        if (posChanged && onDelete) {
+          await onDelete(phasing.annotation.id)
+        }
         await onSave({
           profile_id: phasing.person.id,
           chromosome: phasing.annotation.chromosome,
-          start_position: phasing.annotation.start_position,
-          end_position: phasing.annotation.end_position,
+          start_position: startBp,
+          end_position: endBp,
           strand: phasing.strand,
+          ancestor_id: ancestor.id,
+          ancestor_label: ancestor.name,
+        })
+      } else if (track) {
+        await onSave({
+          profile_id: track.person.id,
+          chromosome: track.chromosome,
+          start_position: startBp,
+          end_position: endBp,
+          strand: track.strand,
           ancestor_id: ancestor.id,
           ancestor_label: ancestor.name,
         })
@@ -123,7 +161,7 @@ export default function AnnotationPopup({
       {/* Header */}
       <div className="mb-2 flex items-center justify-between">
         <span className="text-xs font-semibold text-gray-700">
-          {sim ? 'Przypisz przodka' : 'Edytuj fazowanie'}
+          {sim ? 'Przypisz przodka' : track ? 'Nowa adnotacja' : 'Edytuj fazowanie'}
         </span>
         <button onClick={onClose} className="ml-2 text-xs text-gray-400 hover:text-gray-600">
           ✕
@@ -171,11 +209,45 @@ export default function AnnotationPopup({
         </>
       )}
 
-      {/* PHASING: read-only person + strand label */}
+      {/* PHASING edit: read-only person + strand label */}
       {phasing && (
         <div className="mb-2 text-xs text-gray-500">
           {phasing.person.name} —{' '}
           {phasing.strand === 'maternal' ? 'Maternal' : 'Paternal'}
+        </div>
+      )}
+
+      {/* PHASING-TRACK: read-only person + strand label */}
+      {track && (
+        <div className="mb-2 text-xs text-gray-500">
+          {track.person.name} —{' '}
+          {track.strand === 'maternal' ? 'Maternal' : 'Paternal'}
+        </div>
+      )}
+
+      {/* Position fields (phasing edit and phasing-track only) */}
+      {(phasing || track) && (
+        <div className="mb-2 grid grid-cols-2 gap-2">
+          <div>
+            <label className="mb-1 block text-xs text-gray-500">Start bp</label>
+            <input
+              type="number"
+              value={startBp}
+              onChange={e => setStartBp(Number(e.target.value))}
+              className="w-full rounded border border-gray-300 px-2 py-1 text-sm"
+              disabled={saving}
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs text-gray-500">End bp</label>
+            <input
+              type="number"
+              value={endBp}
+              onChange={e => setEndBp(Number(e.target.value))}
+              className="w-full rounded border border-gray-300 px-2 py-1 text-sm"
+              disabled={saving}
+            />
+          </div>
         </div>
       )}
 
