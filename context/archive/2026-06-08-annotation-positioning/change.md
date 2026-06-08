@@ -1,10 +1,10 @@
 ---
 change_id: annotation-positioning
 title: Realne granice chromosomów + edycja zakresu adnotacji fazowania
-status: impl_reviewed
+status: archived
 created: 2026-06-08
 updated: 2026-06-08
-archived_at: null
+archived_at: 2026-06-08T07:35:14Z
 ---
 
 ## Notes
