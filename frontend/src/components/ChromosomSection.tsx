@@ -27,7 +27,8 @@ const SIM_TRACK_HEIGHT = 20
 const PHASING_TRACK_HEIGHT = 28
 const TRACK_GAP = 2
 const PAD = 4
-const CANVAS_MARGIN = 4  // horizontal breathing room
+const CANVAS_MARGIN = 4      // horizontal breathing room
+const PAIR_LABEL_WIDTH = 96  // left margin for pair name labels in similarity canvas
 
 // ---------------------------------------------------------------------------
 // Local types
@@ -115,13 +116,13 @@ export default function ChromosomSection({
   const simHeight = PAD + nPairs * (SIM_TRACK_HEIGHT + TRACK_GAP) + PAD
   const simTrackWidth = Math.max(1, containerWidth - CANVAS_MARGIN * 2)
 
-  // Segment rows for this chromosome
+  // Segment rows for this chromosome (all pairs including 3-way)
   const chromSegs: SegmentRow[] = pairwisePairs
     .flatMap(pair =>
       pair.segments
         .filter(s => s.chromosome === chrom)
         .map(s => ({
-          pairLabel: pair.person_names.join(' vs '),
+          pairLabel: pair.person_names.join(pair.profile_ids.length > 2 ? ' + ' : ' vs '),
           match_type: s.match_type,
           start_bp: s.start_bp,
           end_bp: s.end_bp,
@@ -151,27 +152,39 @@ export default function ChromosomSection({
     ctx.clearRect(0, 0, simTrackWidth, simHeight)
 
     const newHits: HitTarget[] = []
+    // Area for segment data (right of the label column)
+    const dataW = Math.max(1, simTrackWidth - PAIR_LABEL_WIDTH)
+
+    ctx.font = '10px system-ui, sans-serif'
+    ctx.textBaseline = 'middle'
 
     for (let pi = 0; pi < pairwisePairs.length; pi++) {
       const pair = pairwisePairs[pi]
       const trackY = PAD + pi * (SIM_TRACK_HEIGHT + TRACK_GAP)
+      const isTriplet = pair.profile_ids.length > 2
+      const pairLabel = pair.person_names.join(isTriplet ? ' + ' : ' vs ')
 
-      // Gray background
+      // Pair label on the left
+      ctx.fillStyle = '#6b7280'
+      ctx.textAlign = 'right'
+      const truncated = pairLabel.length > 14 ? pairLabel.slice(0, 13) + '…' : pairLabel
+      ctx.fillText(truncated, PAIR_LABEL_WIDTH - 4, trackY + SIM_TRACK_HEIGHT / 2)
+
+      // Gray background track (right of label)
       ctx.fillStyle = '#e5e7eb'
-      ctx.fillRect(0, trackY, simTrackWidth, SIM_TRACK_HEIGHT)
+      ctx.fillRect(PAIR_LABEL_WIDTH, trackY, dataW, SIM_TRACK_HEIGHT)
 
       for (const seg of pair.segments) {
         if (seg.chromosome !== chrom) continue
-        const x = ((seg.start_bp - rangeStart) / rangeWidth) * simTrackWidth
-        const w = Math.max(2, ((seg.end_bp - seg.start_bp) / rangeWidth) * simTrackWidth)
+        const x = PAIR_LABEL_WIDTH + ((seg.start_bp - rangeStart) / rangeWidth) * dataW
+        const w = Math.max(2, ((seg.end_bp - seg.start_bp) / rangeWidth) * dataW)
         ctx.fillStyle = COLORS[seg.match_type] ?? '#9ca3af'
         ctx.fillRect(x, trackY, w, SIM_TRACK_HEIGHT)
 
         const cm = seg.length_cm != null ? ` | ${seg.length_cm.toFixed(1)} cM` : ''
-        const label = pair.person_names.join(' vs ')
         newHits.push({
           x, y: trackY, w, h: SIM_TRACK_HEIGHT,
-          tooltipContent: `Chr${chrom}: ${seg.start_bp.toLocaleString()}–${seg.end_bp.toLocaleString()} bp | ${seg.match_type} | ${seg.snp_count} SNPs${cm} [${label}]`,
+          tooltipContent: `Chr${chrom}: ${seg.start_bp.toLocaleString()}–${seg.end_bp.toLocaleString()} bp | ${seg.match_type} | ${seg.snp_count} SNPs${cm} [${pairLabel}]`,
           payload: {
             type: 'sim',
             pair,

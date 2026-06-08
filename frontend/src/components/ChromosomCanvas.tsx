@@ -57,13 +57,15 @@ export default function ChromosomCanvas({
   // Derived data (stable memo values)
   // ---------------------------------------------------------------------------
 
+  // pairwisePairs — only for phasing persons (individual profiles needed for maternal/paternal)
   const pairwisePairs = useMemo(
     () => pairs.filter(p => p.profile_ids.length === 2),
     [pairs],
   )
 
+  // All pairs including 3-way — shown as similarity tracks on canvas
   const chromsWithData = useMemo(() => {
-    const all = pairwisePairs.flatMap(p => p.segments.map(s => s.chromosome))
+    const all = pairs.flatMap(p => p.segments.map(s => s.chromosome))
     return [...new Set(all)].sort((a, b) => {
       const na = parseInt(a, 10)
       const nb = parseInt(b, 10)
@@ -72,7 +74,7 @@ export default function ChromosomCanvas({
       if (!isNaN(nb)) return 1
       return a.localeCompare(b)
     })
-  }, [pairwisePairs])
+  }, [pairs])
 
   const phasingPersons = useMemo(() => {
     const ids = new Set(pairwisePairs.flatMap(p => p.profile_ids))
@@ -84,10 +86,10 @@ export default function ChromosomCanvas({
     [ancestors],
   )
 
-  // Merged chromosome bounds from all pairwise pairs
+  // Merged chromosome bounds from all pairs (including 3-way)
   const chromBoundsMap = useMemo(() => {
     const map: Record<string, ChromosomeBounds> = {}
-    for (const pair of pairwisePairs) {
+    for (const pair of pairs) {
       for (const [chrom, b] of Object.entries(pair.chromosome_bounds)) {
         const cur = map[chrom]
         if (!cur) {
@@ -138,7 +140,7 @@ export default function ChromosomCanvas({
     setPopup({ ...payload, px: safeX, py: safeY })
   }
 
-  if (pairwisePairs.length === 0 || chromsWithData.length === 0) return null
+  if (pairs.length === 0 || chromsWithData.length === 0) return null
 
   // ---------------------------------------------------------------------------
   // Legend (same colors as before)
@@ -151,10 +153,10 @@ export default function ChromosomCanvas({
       {/* Legend */}
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-500">
         <span className="font-medium text-gray-600">Pary:</span>
-        {pairwisePairs.map((pair, i) => (
+        {pairs.map((pair, i) => (
           <span key={i} className="flex items-center gap-1">
             <span className="inline-block h-2.5 w-4 rounded-sm bg-gray-300" />
-            {pair.person_names.join(' vs ')}
+            {pair.person_names.join(pair.profile_ids.length > 2 ? ' + ' : ' vs ')}
           </span>
         ))}
         <span className="ml-2 font-medium text-gray-600">Wynik:</span>
@@ -190,7 +192,7 @@ export default function ChromosomCanvas({
           <ChromosomSection
             key={chrom}
             chrom={chrom}
-            pairwisePairs={pairwisePairs}
+            pairwisePairs={pairs}
             phasingPersons={phasingPersons}
             annotations={annotations}
             ancestorColorMap={ancestorColorMap}
