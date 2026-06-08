@@ -8,14 +8,14 @@ export interface AncestorOut {
 }
 
 export const ANCESTOR_COLORS: string[] = [
-  '#f97316', // orange
-  '#a855f7', // purple
-  '#06b6d4', // cyan
-  '#22c55e', // green
-  '#f59e0b', // amber
-  '#ef4444', // red
-  '#6366f1', // indigo
-  '#14b8a6', // teal
+  '#fdba74', // orange-300
+  '#d8b4fe', // purple-300
+  '#67e8f9', // cyan-300
+  '#86efac', // green-300
+  '#fcd34d', // amber-300
+  '#fca5a5', // red-300
+  '#a5b4fc', // indigo-300
+  '#5eead4', // teal-300
 ]
 
 interface Props {
