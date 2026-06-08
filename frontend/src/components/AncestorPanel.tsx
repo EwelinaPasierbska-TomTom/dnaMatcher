@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Pencil, Trash2 } from 'lucide-react'
 import { Button } from './ui/button'
+import { Input } from './ui/input'
 
 export interface AncestorOut {
   id: string
@@ -87,11 +88,12 @@ export default function AncestorPanel({ ancestors, onAdd, onUpdate, onDelete }: 
         {ancestors.map((a) =>
           editId === a.id ? (
             <li key={a.id} className="space-y-2 rounded-md bg-gray-50 p-2">
-              <input
+              <Input
                 value={editName}
                 onChange={(e) => setEditName(e.target.value)}
-                className="w-full text-sm border border-gray-300 rounded px-2 py-1"
+                className="text-sm h-8"
                 disabled={saving}
+                aria-label="Imię przodka"
               />
               <div className="flex flex-wrap gap-1">
                 {ANCESTOR_COLORS.map((c) => (
@@ -140,6 +142,7 @@ export default function AncestorPanel({ ancestors, onAdd, onUpdate, onDelete }: 
                 onClick={() => startEdit(a)}
                 className="opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0"
                 title="Edytuj"
+                aria-label={`Edytuj ${a.name}`}
               >
                 <Pencil className="w-3 h-3" />
               </Button>
@@ -152,6 +155,7 @@ export default function AncestorPanel({ ancestors, onAdd, onUpdate, onDelete }: 
                 }}
                 className="opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0"
                 title="Usuń"
+                aria-label={`Usuń ${a.name}`}
               >
                 <Trash2 className="w-3 h-3" />
               </Button>
@@ -162,11 +166,11 @@ export default function AncestorPanel({ ancestors, onAdd, onUpdate, onDelete }: 
 
       {adding ? (
         <div className="space-y-2 rounded-md bg-gray-50 p-2">
-          <input
+          <Input
             value={addName}
             onChange={(e) => setAddName(e.target.value)}
             placeholder="Imię przodka"
-            className="w-full text-sm border border-gray-300 rounded px-2 py-1"
+            className="text-sm h-8"
             disabled={saving}
             autoFocus
           />

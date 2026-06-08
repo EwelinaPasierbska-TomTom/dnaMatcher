@@ -61,7 +61,11 @@ export default function SignUpPage() {
       return
     }
 
-    navigate('/app')
+    if (data?.session) {
+      navigate('/app')
+    } else {
+      setError('Sprawdź skrzynkę email i potwierdź rejestrację aby się zalogować.')
+    }
   }
 
   return (

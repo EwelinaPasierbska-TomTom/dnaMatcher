@@ -1,7 +1,7 @@
 ---
 id: ui-overhaul
 title: UI Overhaul — adaptacja do wyglądu prototypu chromosome-mapper
-status: implemented
+status: impl_reviewed
 created: 2026-06-08
 updated: 2026-06-08
 

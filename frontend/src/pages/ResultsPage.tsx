@@ -139,7 +139,12 @@ export default function ResultsPage() {
   async function executeDelete() {
     setDeleting(true)
     try {
-      await apiFetch(`/api/comparisons/${id}`, { method: 'DELETE' })
+      const res = await apiFetch(`/api/comparisons/${id}`, { method: 'DELETE' })
+      if (!res.ok) {
+        setDeleting(false)
+        setError('Nie udało się usunąć porównania.')
+        return
+      }
       navigate('/app')
     } catch {
       setDeleting(false)
