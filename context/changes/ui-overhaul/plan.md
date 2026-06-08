@@ -323,28 +323,28 @@ Brak zmian w backendzie, routingu, ani logice auth. Tylko pliki w `frontend/src/
 
 #### Automated
 
-- [x] 1.1 Instalacja pakietów: `cd frontend && npm install` kończy się bez błędów
-- [x] 1.2 TypeScript kompiluje: `npm run build` bez błędów type
-- [x] 1.3 Wszystkie 8 nowych plików komponentów istnieje w `frontend/src/components/ui/` i `frontend/src/lib/utils.ts`
+- [x] 1.1 Instalacja pakietów: `cd frontend && npm install` kończy się bez błędów — aac7675
+- [x] 1.2 TypeScript kompiluje: `npm run build` bez błędów type — aac7675
+- [x] 1.3 Wszystkie 8 nowych plików komponentów istnieje w `frontend/src/components/ui/` i `frontend/src/lib/utils.ts` — aac7675
 
 #### Manual
 
-- [x] 1.4 Żadna istniejąca strona nie zmieniła wyglądu po fazie 1
-- [x] 1.5 Dev server uruchamia się bez błędów w konsoli
+- [x] 1.4 Żadna istniejąca strona nie zmieniła wyglądu po fazie 1 — aac7675
+- [x] 1.5 Dev server uruchamia się bez błędów w konsoli — aac7675
 
 ### Phase 2: Redesign Auth Pages
 
 #### Automated
 
-- [ ] 2.1 `npm run build` bez błędów TypeScript
-- [ ] 2.2 Brak broken imports
+- [x] 2.1 `npm run build` bez błędów TypeScript
+- [x] 2.2 Brak broken imports
 
 #### Manual
 
-- [ ] 2.3 `/login` wyświetla gradient tło + ikonę DNA + "dnaMatcher" + Card z formularzem
-- [ ] 2.4 `/signup` ma identyczny wygląd z 4 polami
-- [ ] 2.5 Logowanie działa z poprawnymi danymi
-- [ ] 2.6 Błędy auth wyświetlają się inline
+- [x] 2.3 `/login` wyświetla gradient tło + ikonę DNA + "dnaMatcher" + Card z formularzem
+- [x] 2.4 `/signup` ma identyczny wygląd z 4 polami
+- [x] 2.5 Logowanie działa z poprawnymi danymi
+- [x] 2.6 Błędy auth wyświetlają się inline
 
 ### Phase 3: Redesign Dashboard (AppPage)
 

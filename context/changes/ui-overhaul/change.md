@@ -4,6 +4,8 @@ title: UI Overhaul — adaptacja do wyglądu prototypu chromosome-mapper
 status: implementing
 created: 2026-06-08
 updated: 2026-06-08
+
+
 ---
 
 ## Opis
