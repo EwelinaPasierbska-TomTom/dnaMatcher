@@ -29,6 +29,7 @@ const TRACK_GAP = 2
 const PAD = 4
 const CANVAS_MARGIN = 4      // horizontal breathing room
 const PAIR_LABEL_WIDTH = 96  // left margin for pair name labels in similarity canvas
+const RULER_HEIGHT = 22      // height of position ruler canvas
 
 // ---------------------------------------------------------------------------
 // Local types
@@ -105,6 +106,10 @@ export default function ChromosomSection({
   const phasingCanvasRefs = useRef<(HTMLCanvasElement | null)[]>([])
   const phasingHits = useRef<HitTarget[][]>([])
 
+  // Position ruler canvases
+  const simRulerRef = useRef<HTMLCanvasElement>(null)
+  const phasingRulerRef = useRef<HTMLCanvasElement>(null)
+
   const [tooltip, setTooltip] = useState<TooltipState | null>(null)
 
   // Derived scale parameters
@@ -134,6 +139,58 @@ export default function ChromosomSection({
         })),
     )
     .sort((a, b) => a.pairIndex - b.pairIndex || a.start_bp - b.start_bp)
+
+  // ---------------------------------------------------------------------------
+  // Draw position ruler — shared helper
+  // ---------------------------------------------------------------------------
+
+  function drawRuler(canvas: HTMLCanvasElement) {
+    const dpr = window.devicePixelRatio || 1
+    canvas.width = Math.round(simTrackWidth * dpr)
+    canvas.height = Math.round(RULER_HEIGHT * dpr)
+    canvas.style.width = `${simTrackWidth}px`
+    canvas.style.height = `${RULER_HEIGHT}px`
+
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+    ctx.scale(dpr, dpr)
+    ctx.clearRect(0, 0, simTrackWidth, RULER_HEIGHT)
+
+    const dataW = Math.max(1, simTrackWidth - PAIR_LABEL_WIDTH)
+    const TICK_COUNT = 10
+    const BASELINE_Y = 14
+    const TICK_TOP = 9
+    const TICK_BOT = 16
+    const LABEL_Y = TICK_TOP - 1   // textBaseline = 'bottom'
+
+    // Baseline
+    ctx.strokeStyle = '#d1d5db'
+    ctx.lineWidth = 0.5
+    ctx.beginPath()
+    ctx.moveTo(PAIR_LABEL_WIDTH, BASELINE_Y)
+    ctx.lineTo(simTrackWidth, BASELINE_Y)
+    ctx.stroke()
+
+    ctx.font = '9px system-ui, sans-serif'
+    ctx.fillStyle = '#9ca3af'
+    ctx.strokeStyle = '#9ca3af'
+    ctx.lineWidth = 0.75
+
+    for (let i = 0; i <= TICK_COUNT; i++) {
+      const x = PAIR_LABEL_WIDTH + (dataW / TICK_COUNT) * i
+      const bp = rangeStart + rangeWidth * (i / TICK_COUNT)
+      const label = Math.round(bp / 1_000_000) + 'M'
+
+      ctx.beginPath()
+      ctx.moveTo(x, TICK_TOP)
+      ctx.lineTo(x, TICK_BOT)
+      ctx.stroke()
+
+      ctx.textBaseline = 'bottom'
+      ctx.textAlign = i === 0 ? 'left' : i === TICK_COUNT ? 'right' : 'center'
+      ctx.fillText(label, x, LABEL_Y)
+    }
+  }
 
   // ---------------------------------------------------------------------------
   // Draw similarity canvas
@@ -202,6 +259,8 @@ export default function ChromosomSection({
 
     simHits.current = newHits
     setTooltip(null)
+
+    if (simRulerRef.current) drawRuler(simRulerRef.current)
   }, [open, containerWidth, pairwisePairs, chrom, rangeStart, rangeWidth, simHeight, simTrackWidth, nPairs])
 
   // ---------------------------------------------------------------------------
@@ -297,6 +356,8 @@ export default function ChromosomSection({
 
     phasingHits.current = newAllHits
     setTooltip(null)
+
+    if (phasingRulerRef.current) drawRuler(phasingRulerRef.current)
   }, [open, containerWidth, phasingPersons, annotations, ancestorColorMap, chrom, rangeStart, rangeWidth])
 
   // ---------------------------------------------------------------------------
@@ -385,6 +446,11 @@ export default function ChromosomSection({
               className="block"
               style={{ cursor: 'crosshair', marginLeft: CANVAS_MARGIN, marginRight: CANVAS_MARGIN }}
             />
+            <canvas
+              ref={simRulerRef}
+              className="block"
+              style={{ marginLeft: CANVAS_MARGIN, marginRight: CANVAS_MARGIN }}
+            />
           </div>
 
           {/* Phasing rows — one per person */}
@@ -402,6 +468,9 @@ export default function ChromosomSection({
                   />
                 </div>
               ))}
+              <div style={{ marginLeft: CANVAS_MARGIN, marginRight: CANVAS_MARGIN }}>
+                <canvas ref={phasingRulerRef} className="block" />
+              </div>
             </div>
           )}
 
