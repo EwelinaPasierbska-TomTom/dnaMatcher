@@ -364,12 +364,12 @@ Brak zmian w backendzie, routingu, ani logice auth. Tylko pliki w `frontend/src/
 
 #### Automated
 
-- [x] 4.1 `npm run build` bez błędów
+- [x] 4.1 `npm run build` bez błędów — 99d6517
 
 #### Manual
 
-- [x] 4.2 `/results/:id` wyświetla gradient tło
-- [x] 4.3 Przycisk "Powrót" ma ikonę ArrowLeft
-- [x] 4.4 Przycisk "Usuń" otwiera AlertDialog (nie natywny `confirm()`)
-- [x] 4.5 Canvas chromosomów działa identycznie — popup adnotacji otwiera się
-- [x] 4.6 AncestorPanel: dodawanie/edycja/usuwanie przodków działa
+- [x] 4.2 `/results/:id` wyświetla gradient tło — 99d6517
+- [x] 4.3 Przycisk "Powrót" ma ikonę ArrowLeft — 99d6517
+- [x] 4.4 Przycisk "Usuń" otwiera AlertDialog (nie natywny `confirm()`) — 99d6517
+- [x] 4.5 Canvas chromosomów działa identycznie — popup adnotacji otwiera się — 99d6517
+- [x] 4.6 AncestorPanel: dodawanie/edycja/usuwanie przodków działa — 99d6517
