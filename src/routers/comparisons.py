@@ -94,11 +94,9 @@ def _segment_to_row(
     }
 
 
-def _segments_to_pair_result(
-    segments: list[Segment],
-    profile_ids: list[UUID],
-    person_names: list[str],
-) -> PairResult:
+def _compute_chromosome_bounds(
+    segments: list[SegmentOut],
+) -> dict[str, ChromosomeBoundsOut]:
     bounds: dict[str, ChromosomeBoundsOut] = {}
     for s in segments:
         existing = bounds.get(s.chromosome)
@@ -111,25 +109,34 @@ def _segments_to_pair_result(
                 start_bp=min(existing.start_bp, s.start_bp),
                 end_bp=max(existing.end_bp, s.end_bp),
             )
+    return bounds
+
+
+def _segments_to_pair_result(
+    segments: list[Segment],
+    profile_ids: list[UUID],
+    person_names: list[str],
+) -> PairResult:
+    segs_out = [
+        SegmentOut(
+            chromosome=s.chromosome,
+            match_type=s.match_type,
+            start_bp=s.start_bp,
+            end_bp=s.end_bp,
+            start_cm=s.start_cm,
+            end_cm=s.end_cm,
+            length_bp=s.length_bp,
+            length_cm=s.length_cm,
+            snp_count=s.snp_count,
+            density=s.density,
+        )
+        for s in segments
+    ]
     return PairResult(
         profile_ids=profile_ids,
         person_names=person_names,
-        segments=[
-            SegmentOut(
-                chromosome=s.chromosome,
-                match_type=s.match_type,
-                start_bp=s.start_bp,
-                end_bp=s.end_bp,
-                start_cm=s.start_cm,
-                end_cm=s.end_cm,
-                length_bp=s.length_bp,
-                length_cm=s.length_cm,
-                snp_count=s.snp_count,
-                density=s.density,
-            )
-            for s in segments
-        ],
-        chromosome_bounds=bounds,
+        segments=segs_out,
+        chromosome_bounds=_compute_chromosome_bounds(segs_out),
     )
 
 
@@ -376,6 +383,7 @@ def get_comparison(
             profile_ids=[UUID(pid) for pid in key],
             person_names=[profiles_map.get(pid, {}).get("name", "") for pid in key],
             segments=segs,
+            chromosome_bounds=_compute_chromosome_bounds(segs),
         )
         for key, segs in pair_map.items()
     ]

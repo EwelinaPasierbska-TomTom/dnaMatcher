@@ -106,9 +106,6 @@ export default function AnnotationPopup({
         const posChanged =
           startBp !== phasing.annotation.start_position ||
           endBp !== phasing.annotation.end_position
-        if (posChanged && onDelete) {
-          await onDelete(phasing.annotation.id)
-        }
         await onSave({
           profile_id: phasing.person.id,
           chromosome: phasing.annotation.chromosome,
@@ -118,6 +115,9 @@ export default function AnnotationPopup({
           ancestor_id: ancestor.id,
           ancestor_label: ancestor.name,
         })
+        if (posChanged && onDelete) {
+          await onDelete(phasing.annotation.id)
+        }
       } else if (track) {
         await onSave({
           profile_id: track.person.id,
