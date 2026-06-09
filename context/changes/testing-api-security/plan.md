@@ -295,8 +295,8 @@ All 7 tests are route integration tests (FastAPI TestClient + mocked Supabase). 
 
 #### Automated
 
-- [x] 3.1 §6.2 no longer contains "TBD": `grep -c "TBD" context/foundation/test-plan.md` is lower than before this plan
+- [x] 3.1 §6.2 no longer contains "TBD": `grep -c "TBD" context/foundation/test-plan.md` is lower than before this plan — cbaf2fb
 
 #### Manual
 
-- [x] 3.2 §6.2 is self-contained: a new contributor can add a route security test using only §6.2 as a guide
+- [x] 3.2 §6.2 is self-contained: a new contributor can add a route security test using only §6.2 as a guide — cbaf2fb
