@@ -170,25 +170,25 @@ All tests are route integration tests with mocked Supabase (FastAPI TestClient +
 
 #### Automated
 
-- [x] 1.1 Migration file exists and is valid SQL
-- [x] 1.2 Full test suite green: `.venv/bin/pytest --tb=short`
-- [x] 1.3 Type check passes: `.venv/bin/mypy src/ --ignore-missing-imports`
-- [x] 1.4 Lint and format pass: `.venv/bin/ruff check src/routers/annotations.py && .venv/bin/ruff format --check src/routers/annotations.py`
+- [x] 1.1 Migration file exists and is valid SQL — 52963a7
+- [x] 1.2 Full test suite green: `.venv/bin/pytest --tb=short` — 52963a7
+- [x] 1.3 Type check passes: `.venv/bin/mypy src/ --ignore-missing-imports` — 52963a7
+- [x] 1.4 Lint and format pass: `.venv/bin/ruff check src/routers/annotations.py && .venv/bin/ruff format --check src/routers/annotations.py` — 52963a7
 
 #### Manual
 
-- [x] 1.5 Migration applies in Supabase without error
-- [x] 1.6 Maternal + paternal at same position both survive in the app
-- [x] 1.7 Editing maternal label does not affect paternal annotation
+- [x] 1.5 Migration applies in Supabase without error — 52963a7
+- [x] 1.6 Maternal + paternal at same position both survive in the app — 52963a7
+- [x] 1.7 Editing maternal label does not affect paternal annotation — 52963a7
 
 ### Phase 2: Regression Test
 
 #### Automated
 
-- [ ] 2.1 New test passes: `pytest tests/test_annotations_api.py::test_post_annotation_same_position_different_strand_both_survive -v`
-- [ ] 2.2 Full test suite green: `.venv/bin/pytest --tb=short`
-- [ ] 2.3 Lint and format pass: `.venv/bin/ruff check tests/test_annotations_api.py && .venv/bin/ruff format --check tests/test_annotations_api.py`
+- [x] 2.1 New test passes: `pytest tests/test_annotations_api.py::test_post_annotation_same_position_different_strand_both_survive -v`
+- [x] 2.2 Full test suite green: `.venv/bin/pytest --tb=short`
+- [x] 2.3 Lint and format pass: `.venv/bin/ruff check tests/test_annotations_api.py && .venv/bin/ruff format --check tests/test_annotations_api.py`
 
 #### Manual
 
-- [ ] 2.4 Test name and assert messages clearly point to `strand` as the missing key on failure
+- [x] 2.4 Test name and assert messages clearly point to `strand` as the missing key on failure

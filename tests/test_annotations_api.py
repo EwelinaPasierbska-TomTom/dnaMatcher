@@ -205,3 +205,51 @@ def test_get_annotations_returns_empty_list_when_none_exist() -> None:
 
     assert response.status_code == 200
     assert response.json() == []
+
+
+def test_post_annotation_same_position_different_strand_both_survive() -> None:
+    """Maternal and paternal annotations at the same position are distinct DB rows.
+
+    Regression guard for migration 007: the old on_conflict key omitted strand,
+    so saving paternal at a position already occupied by maternal silently
+    overwrote the maternal row. This test pins that:
+      1. Both upsert calls return 200 (neither is blocked by the other).
+      2. The on_conflict key passed to each upsert call includes "strand" — so a
+         future revert of that key fails here before any DB is touched.
+    """
+    ann_mock = _ann_table_for_upsert(ANNOTATION_ROW)
+    supabase_mock = _make_db_mock(
+        dna_profiles=_profile_table(found=True),
+        ancestor_annotations=ann_mock,
+    )
+    app.dependency_overrides[get_current_user] = lambda: FAKE_USER
+    app.dependency_overrides[get_supabase_client] = lambda: supabase_mock
+
+    client = TestClient(app)
+    shared_body = {
+        "profile_id": PROFILE_ID,
+        "chromosome": "1",
+        "start_position": 1_000_000,
+        "end_position": 5_000_000,
+        "ancestor_label": "Babcia Maria",
+    }
+
+    r_maternal = client.post(
+        f"/api/comparisons/{COMPARISON_ID}/annotations",
+        json={**shared_body, "strand": "maternal"},
+    )
+    r_paternal = client.post(
+        f"/api/comparisons/{COMPARISON_ID}/annotations",
+        json={**shared_body, "strand": "paternal"},
+    )
+
+    assert r_maternal.status_code == 200, r_maternal.text
+    assert r_paternal.status_code == 200, r_paternal.text
+    assert ann_mock.upsert.call_count == 2, (
+        f"Expected 2 upsert calls (one per strand); got {ann_mock.upsert.call_count}"
+    )
+    for call in ann_mock.upsert.call_args_list:
+        assert "strand" in call.kwargs.get("on_conflict", ""), (
+            "on_conflict must include 'strand' to prevent sibling-strand collision; "
+            f"got on_conflict={call.kwargs.get('on_conflict')!r}"
+        )
