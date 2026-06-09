@@ -3,7 +3,7 @@ change_id: testing-api-security
 title: API security and data integrity — Phase 2 of test-plan rollout
 status: implementing
 created: 2026-06-08
-updated: 2026-06-08
+updated: 2026-06-09
 archived_at: null
 ---
 

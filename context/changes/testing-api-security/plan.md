@@ -268,28 +268,28 @@ All 7 tests are route integration tests (FastAPI TestClient + mocked Supabase). 
 
 #### Automated
 
-- [x] 1.1 All 4 IDOR tests pass: `pytest tests/test_api_security.py -k "wrong_user or wrong_profile or membership" -v`
-- [x] 1.2 Full test suite green: `pytest --tb=short`
-- [x] 1.3 Type check passes: `mypy src/ tests/test_api_security.py --ignore-missing-imports`
-- [x] 1.4 Lint passes: `ruff check tests/test_api_security.py`
+- [x] 1.1 All 4 IDOR tests pass: `pytest tests/test_api_security.py -k "wrong_user or wrong_profile or membership" -v` — ab24d27
+- [x] 1.2 Full test suite green: `pytest --tb=short` — ab24d27
+- [x] 1.3 Type check passes: `mypy src/ tests/test_api_security.py --ignore-missing-imports` — ab24d27
+- [x] 1.4 Lint passes: `ruff check tests/test_api_security.py` — ab24d27
 
 #### Manual
 
-- [x] 1.5 Each test name clearly conveys security intent in `pytest -v` output
-- [x] 1.6 Logic-gap test docstring is visible and self-explanatory
+- [x] 1.5 Each test name clearly conveys security intent in `pytest -v` output — ab24d27
+- [x] 1.6 Logic-gap test docstring is visible and self-explanatory — ab24d27
 
 ### Phase 2: DNA Persistence Schema Guard Tests
 
 #### Automated
 
-- [ ] 2.1 All 3 schema-guard tests pass: `pytest tests/test_api_security.py -k "raw_bytes or segment_schema or parse_error" -v`
-- [ ] 2.2 Full test suite green: `pytest --tb=short`
-- [ ] 2.3 Type check passes: `mypy src/ tests/test_api_security.py --ignore-missing-imports`
-- [ ] 2.4 Lint passes: `ruff check tests/test_api_security.py`
+- [x] 2.1 All 3 schema-guard tests pass: `pytest tests/test_api_security.py -k "raw_bytes or segment_schema or parse_error" -v`
+- [x] 2.2 Full test suite green: `pytest --tb=short`
+- [x] 2.3 Type check passes: `mypy src/ tests/test_api_security.py --ignore-missing-imports`
+- [x] 2.4 Lint passes: `ruff check tests/test_api_security.py`
 
 #### Manual
 
-- [ ] 2.5 Dummy-field regression check: add `"allele_debug": "AA"` to a write dict, confirm test fails, revert
+- [x] 2.5 Dummy-field regression check: add `"allele_debug": "AA"` to a write dict, confirm test fails, revert
 
 ### Phase 3: §6.2 Cookbook Update
 
