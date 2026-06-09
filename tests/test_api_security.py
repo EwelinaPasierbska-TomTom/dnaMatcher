@@ -16,6 +16,7 @@ Covers two risks from context/foundation/test-plan.md:
     After a parse-error upload, Supabase insert() is asserted to never be
     called.
 """
+
 from __future__ import annotations
 
 from unittest.mock import MagicMock
@@ -52,9 +53,7 @@ _VALID_CSV = b"\n".join(
 
 # Invalid CSV: positions below the chr1 genetic-map range, alleles "--".
 # parse_myheritage_csv raises ValueError → route returns 400 before any DB write.
-_INVALID_CSV = b"\n".join(
-    f"rs{i};1;{i * 1000};--;;;".encode() for i in range(1, 5)
-)
+_INVALID_CSV = b"\n".join(f"rs{i};1;{i * 1000};--;;;".encode() for i in range(1, 5))
 
 # Expected column sets for Supabase insert() call assertions (Risk #4).
 _EXPECTED_PROFILES_COLUMNS: frozenset[str] = frozenset(
