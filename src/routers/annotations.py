@@ -132,7 +132,10 @@ def upsert_annotation(
     }
     result = (
         db.from_("ancestor_annotations")
-        .upsert(row, on_conflict="profile_id,chromosome,start_position,end_position")
+        .upsert(
+            row,
+            on_conflict="profile_id,chromosome,start_position,end_position,strand",
+        )
         .execute()
     )
     if not result.data:
