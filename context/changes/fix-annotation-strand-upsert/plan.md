@@ -185,10 +185,10 @@ All tests are route integration tests with mocked Supabase (FastAPI TestClient +
 
 #### Automated
 
-- [x] 2.1 New test passes: `pytest tests/test_annotations_api.py::test_post_annotation_same_position_different_strand_both_survive -v`
-- [x] 2.2 Full test suite green: `.venv/bin/pytest --tb=short`
-- [x] 2.3 Lint and format pass: `.venv/bin/ruff check tests/test_annotations_api.py && .venv/bin/ruff format --check tests/test_annotations_api.py`
+- [x] 2.1 New test passes: `pytest tests/test_annotations_api.py::test_post_annotation_same_position_different_strand_both_survive -v` — 20374de
+- [x] 2.2 Full test suite green: `.venv/bin/pytest --tb=short` — 20374de
+- [x] 2.3 Lint and format pass: `.venv/bin/ruff check tests/test_annotations_api.py && .venv/bin/ruff format --check tests/test_annotations_api.py` — 20374de
 
 #### Manual
 
-- [x] 2.4 Test name and assert messages clearly point to `strand` as the missing key on failure
+- [x] 2.4 Test name and assert messages clearly point to `strand` as the missing key on failure — 20374de
