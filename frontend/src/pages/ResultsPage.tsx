@@ -89,7 +89,8 @@ export default function ResultsPage() {
             a.profile_id === saved.profile_id &&
             a.chromosome === saved.chromosome &&
             a.start_position === saved.start_position &&
-            a.end_position === saved.end_position
+            a.end_position === saved.end_position &&
+            a.strand === saved.strand
           ),
       )
       return [...filtered, saved]
