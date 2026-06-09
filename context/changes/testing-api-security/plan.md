@@ -282,21 +282,21 @@ All 7 tests are route integration tests (FastAPI TestClient + mocked Supabase). 
 
 #### Automated
 
-- [x] 2.1 All 3 schema-guard tests pass: `pytest tests/test_api_security.py -k "raw_bytes or segment_schema or parse_error" -v`
-- [x] 2.2 Full test suite green: `pytest --tb=short`
-- [x] 2.3 Type check passes: `mypy src/ tests/test_api_security.py --ignore-missing-imports`
-- [x] 2.4 Lint passes: `ruff check tests/test_api_security.py`
+- [x] 2.1 All 3 schema-guard tests pass: `pytest tests/test_api_security.py -k "raw_bytes or segment_schema or parse_error" -v` — 18c935c
+- [x] 2.2 Full test suite green: `pytest --tb=short` — 18c935c
+- [x] 2.3 Type check passes: `mypy src/ tests/test_api_security.py --ignore-missing-imports` — 18c935c
+- [x] 2.4 Lint passes: `ruff check tests/test_api_security.py` — 18c935c
 
 #### Manual
 
-- [x] 2.5 Dummy-field regression check: add `"allele_debug": "AA"` to a write dict, confirm test fails, revert
+- [x] 2.5 Dummy-field regression check: add `"allele_debug": "AA"` to a write dict, confirm test fails, revert — 18c935c
 
 ### Phase 3: §6.2 Cookbook Update
 
 #### Automated
 
-- [ ] 3.1 §6.2 no longer contains "TBD": `grep -c "TBD" context/foundation/test-plan.md` is lower than before this plan
+- [x] 3.1 §6.2 no longer contains "TBD": `grep -c "TBD" context/foundation/test-plan.md` is lower than before this plan
 
 #### Manual
 
-- [ ] 3.2 §6.2 is self-contained: a new contributor can add a route security test using only §6.2 as a guide
+- [x] 3.2 §6.2 is self-contained: a new contributor can add a route security test using only §6.2 as a guide
