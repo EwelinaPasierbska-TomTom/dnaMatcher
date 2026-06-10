@@ -176,6 +176,7 @@ export default function ResultsPage() {
 
   async function handleExport(chromosome: string): Promise<void> {
     setExportOpen(false)
+    if (!data) return
     const canvas = canvasRef.current
     if (!canvas) return
     const imageDataUrl = await canvas.getChromosomeReport(chromosome)
@@ -184,7 +185,7 @@ export default function ResultsPage() {
       year: 'numeric', month: 'long', day: 'numeric',
     })
     const html = generateReportHtml({
-      comparisonName: data!.name,
+      comparisonName: data.name,
       chromosome,
       date,
       imageDataUrl,

@@ -1,7 +1,7 @@
 import type { AncestorOut } from '../components/AncestorPanel'
 import type { AnnotationOut } from '../components/ChromosomeDiagram'
 
-interface ReportOptions {
+export interface ReportOptions {
   comparisonName: string
   chromosome: string
   date: string
