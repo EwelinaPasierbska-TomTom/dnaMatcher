@@ -1,7 +1,7 @@
 ---
 change_id: report-export
 title: Export standalone HTML report and JPG screenshot of chromosome visualization
-status: implementing
+status: implemented
 created: 2026-06-10
 updated: 2026-06-10
 archived_at: null

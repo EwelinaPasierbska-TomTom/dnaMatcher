@@ -414,13 +414,13 @@ None planned — the `generateReportHtml` function is pure and verifiable manual
 
 #### Automated
 
-- [x] 4.1 TypeScript compiles: `cd frontend && npx tsc --noEmit`
-- [x] 4.2 Lint passes: `cd frontend && npx eslint src/pages/ResultsPage.tsx`
-- [x] 4.3 Frontend build succeeds: `cd frontend && npm run build`
+- [x] 4.1 TypeScript compiles: `cd frontend && npx tsc --noEmit` — d537cd9
+- [x] 4.2 Lint passes: `cd frontend && npx eslint src/pages/ResultsPage.tsx` — d537cd9
+- [x] 4.3 Frontend build succeeds: `cd frontend && npm run build` — d537cd9
 
 #### Manual
 
-- [x] 4.4 Dropdown lists available chromosomes
-- [x] 4.5 Collapsed section auto-expands and capture succeeds
-- [x] 4.6 Report shows canvas image + metadata + annotations (or "Brak adnotacji")
-- [x] 4.7 No regressions: annotation save, ancestor management, delete comparison
+- [x] 4.4 Dropdown lists available chromosomes — d537cd9
+- [x] 4.5 Collapsed section auto-expands and capture succeeds — d537cd9
+- [x] 4.6 Report shows canvas image + metadata + annotations (or "Brak adnotacji") — d537cd9
+- [x] 4.7 No regressions: annotation save, ancestor management, delete comparison — d537cd9
