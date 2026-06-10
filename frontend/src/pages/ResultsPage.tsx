@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Dna, Trash2 } from 'lucide-react'
+import { ArrowLeft, Download, Dna, Trash2 } from 'lucide-react'
 import AncestorPanel, { type AncestorOut } from '../components/AncestorPanel'
-import ChromosomCanvas, { type PairResult } from '../components/ChromosomCanvas'
+import ChromosomCanvas, { type ChromosomCanvasHandle, type PairResult } from '../components/ChromosomCanvas'
+import { generateReportHtml } from '../lib/reportHtml'
 import type { AnnotationOut } from '../components/ChromosomeDiagram'
 import { type ProfileMeta, type UpsertAnnotationBody } from '../components/SegmentTable'
 import { apiFetch } from '../lib/api'
@@ -37,6 +38,8 @@ export default function ResultsPage() {
   const [deleting, setDeleting] = useState(false)
   const [annotations, setAnnotations] = useState<AnnotationOut[]>([])
   const [ancestors, setAncestors] = useState<AncestorOut[]>([])
+  const canvasRef = useRef<ChromosomCanvasHandle>(null)
+  const [exportOpen, setExportOpen] = useState(false)
 
   useEffect(() => {
     void (async () => {
@@ -153,6 +156,47 @@ export default function ResultsPage() {
     }
   }
 
+  const exportChroms = useMemo(
+    () =>
+      data
+        ? [
+            ...new Set(
+              data.pairs.flatMap(p => p.segments.map(s => s.chromosome)),
+            ),
+          ].sort((a, b) => {
+            const na = parseInt(a, 10), nb = parseInt(b, 10)
+            if (!isNaN(na) && !isNaN(nb)) return na - nb
+            if (!isNaN(na)) return -1
+            if (!isNaN(nb)) return 1
+            return a.localeCompare(b)
+          })
+        : [],
+    [data],
+  )
+
+  async function handleExport(chromosome: string): Promise<void> {
+    setExportOpen(false)
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const imageDataUrl = await canvas.getChromosomeReport(chromosome)
+    if (!imageDataUrl) return
+    const date = new Date().toLocaleDateString('pl-PL', {
+      year: 'numeric', month: 'long', day: 'numeric',
+    })
+    const html = generateReportHtml({
+      comparisonName: data!.name,
+      chromosome,
+      date,
+      imageDataUrl,
+      annotations,
+      ancestors,
+    })
+    const blob = new Blob([html], { type: 'text/html; charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    window.open(url, '_blank')
+    setTimeout(() => URL.revokeObjectURL(url), 60_000)
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center">
@@ -193,6 +237,33 @@ export default function ResultsPage() {
                   Powrót
                 </Button>
 
+                <div className="relative">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setExportOpen(v => !v)}
+                  >
+                    <Download className="w-4 h-4 mr-1" />
+                    Eksportuj
+                  </Button>
+                  {exportOpen && exportChroms.length > 0 && (
+                    <div
+                      className="absolute right-0 top-full z-20 mt-1 min-w-[160px] rounded border border-gray-200 bg-white shadow-lg"
+                      onMouseLeave={() => setExportOpen(false)}
+                    >
+                      {exportChroms.map(chrom => (
+                        <button
+                          key={chrom}
+                          className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => void handleExport(chrom)}
+                        >
+                          Chromosom {chrom}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button variant="destructive" size="sm" disabled={deleting}>
@@ -224,6 +295,7 @@ export default function ResultsPage() {
                   Diagram chromosomów
                 </h3>
                 <ChromosomCanvas
+                  ref={canvasRef}
                   pairs={data.pairs}
                   allProfiles={data.profiles}
                   annotations={annotations}

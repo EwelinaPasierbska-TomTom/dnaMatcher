@@ -403,24 +403,24 @@ None planned — the `generateReportHtml` function is pure and verifiable manual
 
 #### Automated
 
-- [x] 3.1 TypeScript compiles: `cd frontend && npx tsc --noEmit`
-- [x] 3.2 Lint passes: `cd frontend && npx eslint src/lib/reportHtml.ts`
+- [x] 3.1 TypeScript compiles: `cd frontend && npx tsc --noEmit` — 0f460fe
+- [x] 3.2 Lint passes: `cd frontend && npx eslint src/lib/reportHtml.ts` — 0f460fe
 
 #### Manual
 
-- [x] 3.3 Template verified end-to-end in Phase 4
+- [x] 3.3 Template verified end-to-end in Phase 4 — 0f460fe
 
 ### Phase 4: Export UI in ResultsPage
 
 #### Automated
 
-- [ ] 4.1 TypeScript compiles: `cd frontend && npx tsc --noEmit`
-- [ ] 4.2 Lint passes: `cd frontend && npx eslint src/pages/ResultsPage.tsx`
-- [ ] 4.3 Frontend build succeeds: `cd frontend && npm run build`
+- [x] 4.1 TypeScript compiles: `cd frontend && npx tsc --noEmit`
+- [x] 4.2 Lint passes: `cd frontend && npx eslint src/pages/ResultsPage.tsx`
+- [x] 4.3 Frontend build succeeds: `cd frontend && npm run build`
 
 #### Manual
 
-- [ ] 4.4 Dropdown lists available chromosomes
-- [ ] 4.5 Collapsed section auto-expands and capture succeeds
-- [ ] 4.6 Report shows canvas image + metadata + annotations (or "Brak adnotacji")
-- [ ] 4.7 No regressions: annotation save, ancestor management, delete comparison
+- [x] 4.4 Dropdown lists available chromosomes
+- [x] 4.5 Collapsed section auto-expands and capture succeeds
+- [x] 4.6 Report shows canvas image + metadata + annotations (or "Brak adnotacji")
+- [x] 4.7 No regressions: annotation save, ancestor management, delete comparison

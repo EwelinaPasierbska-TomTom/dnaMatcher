@@ -93,7 +93,7 @@ const ChromosomCanvas = forwardRef<ChromosomCanvasHandle, Props>(function Chromo
       const handle = sectionRefs.current.get(chromosome)
       if (!handle) return null
       handle.openSection()
-      await new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+      await new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))
       return handle.getCanvasDataUrl()
     },
   }), [chromsWithData])
