@@ -392,23 +392,23 @@ None planned — the `generateReportHtml` function is pure and verifiable manual
 
 #### Automated
 
-- [x] 2.1 TypeScript compiles with no new errors: `cd frontend && npx tsc --noEmit`
-- [x] 2.2 Lint passes: `cd frontend && npx eslint src/components/ChromosomCanvas.tsx`
+- [x] 2.1 TypeScript compiles with no new errors: `cd frontend && npx tsc --noEmit` — 598f210
+- [x] 2.2 Lint passes: `cd frontend && npx eslint src/components/ChromosomCanvas.tsx` — 598f210
 
 #### Manual
 
-- [x] 2.3 No regressions in ChromosomCanvas (sections, annotations, popup)
+- [x] 2.3 No regressions in ChromosomCanvas (sections, annotations, popup) — 598f210
 
 ### Phase 3: HTML report template utility
 
 #### Automated
 
-- [ ] 3.1 TypeScript compiles: `cd frontend && npx tsc --noEmit`
-- [ ] 3.2 Lint passes: `cd frontend && npx eslint src/lib/reportHtml.ts`
+- [x] 3.1 TypeScript compiles: `cd frontend && npx tsc --noEmit`
+- [x] 3.2 Lint passes: `cd frontend && npx eslint src/lib/reportHtml.ts`
 
 #### Manual
 
-- [ ] 3.3 Template verified end-to-end in Phase 4
+- [x] 3.3 Template verified end-to-end in Phase 4
 
 ### Phase 4: Export UI in ResultsPage
 
