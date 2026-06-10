@@ -83,7 +83,7 @@ Import `forwardRef` and `useImperativeHandle` from React.
 
 **Intent**: Wire the handle methods: `openSection` flips the collapsible state; `getCanvasDataUrl` composites all currently-drawn canvases into one JPEG and returns the data URL.
 
-**Contract**: Place the hook after all canvas ref declarations. Dependencies array: `[open]`.
+**Contract**: Place the hook after all canvas ref declarations. Dependencies array: `[phasingPersons.length]`.
 
 `openSection`: calls `setOpen(true)`.
 
@@ -381,23 +381,23 @@ None planned — the `generateReportHtml` function is pure and verifiable manual
 
 #### Automated
 
-- [x] 1.1 TypeScript compiles with no new errors: `cd frontend && npx tsc --noEmit`
-- [x] 1.2 Lint passes: `cd frontend && npx eslint src/components/ChromosomSection.tsx`
+- [x] 1.1 TypeScript compiles with no new errors: `cd frontend && npx tsc --noEmit` — 2db8f45
+- [x] 1.2 Lint passes: `cd frontend && npx eslint src/components/ChromosomSection.tsx` — 2db8f45
 
 #### Manual
 
-- [x] 1.3 Canvas `toDataURL` returns valid data in browser console; no visual regressions
+- [x] 1.3 Canvas `toDataURL` returns valid data in browser console; no visual regressions — 2db8f45
 
 ### Phase 2: ChromosomCanvas — forwardRef + getChromosomeReport
 
 #### Automated
 
-- [ ] 2.1 TypeScript compiles with no new errors: `cd frontend && npx tsc --noEmit`
-- [ ] 2.2 Lint passes: `cd frontend && npx eslint src/components/ChromosomCanvas.tsx`
+- [x] 2.1 TypeScript compiles with no new errors: `cd frontend && npx tsc --noEmit`
+- [x] 2.2 Lint passes: `cd frontend && npx eslint src/components/ChromosomCanvas.tsx`
 
 #### Manual
 
-- [ ] 2.3 No regressions in ChromosomCanvas (sections, annotations, popup)
+- [x] 2.3 No regressions in ChromosomCanvas (sections, annotations, popup)
 
 ### Phase 3: HTML report template utility
 

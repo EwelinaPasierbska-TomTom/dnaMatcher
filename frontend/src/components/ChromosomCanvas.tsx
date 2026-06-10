@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import type { AncestorOut } from './AncestorPanel'
 import AnnotationPopup from './AnnotationPopup'
 import type { PhasingPayload, PhasingTrackPayload, PopupPayload, SimPayload } from './AnnotationPopup'
 import type { AnnotationOut, SegmentOut } from './ChromosomeDiagram'
 import ChromosomSection from './ChromosomSection'
+import type { ChromosomSectionHandle } from './ChromosomSection'
 import type { ProfileMeta, UpsertAnnotationBody } from './SegmentTable'
 
 // ---------------------------------------------------------------------------
@@ -37,10 +38,19 @@ interface Props {
 }
 
 // ---------------------------------------------------------------------------
+// Handle
+// ---------------------------------------------------------------------------
+
+export interface ChromosomCanvasHandle {
+  chromsWithData: string[]
+  getChromosomeReport: (chromosome: string) => Promise<string | null>
+}
+
+// ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
-export default function ChromosomCanvas({
+const ChromosomCanvas = forwardRef<ChromosomCanvasHandle, Props>(function ChromosomCanvas({
   pairs,
   allProfiles,
   annotations,
@@ -48,8 +58,9 @@ export default function ChromosomCanvas({
   chromosomeLengths,
   onAnnotate,
   onDeleteAnnotation,
-}: Props) {
+}: Props, ref) {
   const mainContainerRef = useRef<HTMLDivElement>(null)
+  const sectionRefs = useRef<Map<string, ChromosomSectionHandle>>(new Map())
   const [popup, setPopup] = useState<PopupPayload | null>(null)
   const [containerWidth, setContainerWidth] = useState(0)
 
@@ -75,6 +86,17 @@ export default function ChromosomCanvas({
       return a.localeCompare(b)
     })
   }, [pairs])
+
+  useImperativeHandle(ref, () => ({
+    chromsWithData,
+    getChromosomeReport: async (chromosome: string) => {
+      const handle = sectionRefs.current.get(chromosome)
+      if (!handle) return null
+      handle.openSection()
+      await new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+      return handle.getCanvasDataUrl()
+    },
+  }), [chromsWithData])
 
   const phasingPersons = useMemo(() => {
     const ids = new Set(pairwisePairs.flatMap(p => p.profile_ids))
@@ -191,6 +213,10 @@ export default function ChromosomCanvas({
         {chromsWithData.map(chrom => (
           <ChromosomSection
             key={chrom}
+            ref={handle => {
+              if (handle) sectionRefs.current.set(chrom, handle)
+              else sectionRefs.current.delete(chrom)
+            }}
             chrom={chrom}
             pairwisePairs={pairs}
             phasingPersons={phasingPersons}
@@ -223,4 +249,6 @@ export default function ChromosomCanvas({
       </div>
     </div>
   )
-}
+})
+
+export default ChromosomCanvas

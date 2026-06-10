@@ -84,6 +84,11 @@ interface Props {
 // Handle
 // ---------------------------------------------------------------------------
 
+/**
+ * Caller contract: after openSection(), await a double requestAnimationFrame
+ * before calling getCanvasDataUrl() — draw effects fire after the re-render,
+ * not synchronously. Skipping the wait returns a blank JPEG, not null.
+ */
 export interface ChromosomSectionHandle {
   openSection: () => void
   getCanvasDataUrl: () => string | null
@@ -145,7 +150,7 @@ const ChromosomSection = forwardRef<ChromosomSectionHandle, Props>(function Chro
 
       return offscreen.toDataURL('image/jpeg', 0.92)
     },
-  }), [open, phasingPersons.length])
+  }), [phasingPersons.length])
 
   const [tooltip, setTooltip] = useState<TooltipState | null>(null)
 
