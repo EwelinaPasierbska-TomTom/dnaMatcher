@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import type { PhasingPayload, PhasingTrackPayload, SimPayload } from './AnnotationPopup'
 import type { AnnotationOut } from './ChromosomeDiagram'
 import type { ChromosomeBounds, PairResult } from './ChromosomCanvas'
@@ -81,10 +81,19 @@ interface Props {
 }
 
 // ---------------------------------------------------------------------------
+// Handle
+// ---------------------------------------------------------------------------
+
+export interface ChromosomSectionHandle {
+  openSection: () => void
+  getCanvasDataUrl: () => string | null
+}
+
+// ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
-export default function ChromosomSection({
+const ChromosomSection = forwardRef<ChromosomSectionHandle, Props>(function ChromosomSection({
   chrom,
   pairwisePairs,
   phasingPersons,
@@ -94,7 +103,7 @@ export default function ChromosomSection({
   chromosomeLengths,
   containerWidth,
   onPopupRequest,
-}: Props) {
+}: Props, ref) {
   const [open, setOpen] = useState(false)
   const sectionRef = useRef<HTMLDivElement>(null)
 
@@ -109,6 +118,34 @@ export default function ChromosomSection({
   // Position ruler canvases
   const simRulerRef = useRef<HTMLCanvasElement>(null)
   const phasingRulerRef = useRef<HTMLCanvasElement>(null)
+
+  useImperativeHandle(ref, () => ({
+    openSection: () => setOpen(true),
+    getCanvasDataUrl: () => {
+      const canvases: HTMLCanvasElement[] = [
+        simCanvasRef.current,
+        simRulerRef.current,
+        ...phasingCanvasRefs.current,
+        phasingPersons.length > 0 ? phasingRulerRef.current : null,
+      ].filter((c): c is HTMLCanvasElement => c !== null && c.width > 0)
+
+      if (canvases.length === 0) return null
+
+      const offscreen = document.createElement('canvas')
+      offscreen.width = canvases[0].width
+      offscreen.height = canvases.reduce((sum, c) => sum + c.height, 0)
+      const ctx = offscreen.getContext('2d')
+      if (!ctx) return null
+
+      let y = 0
+      for (const canvas of canvases) {
+        ctx.drawImage(canvas, 0, y)
+        y += canvas.height
+      }
+
+      return offscreen.toDataURL('image/jpeg', 0.92)
+    },
+  }), [open, phasingPersons.length])
 
   const [tooltip, setTooltip] = useState<TooltipState | null>(null)
 
@@ -534,4 +571,6 @@ export default function ChromosomSection({
       )}
     </div>
   )
-}
+})
+
+export default ChromosomSection
